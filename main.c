@@ -20,8 +20,10 @@ typedef struct
 {
     int apariciones;
     char palabra[100];
+    int relevancia;
     List* lineaPalabra;
     List* libroAsociado;
+    
 } tipoPalabra;
 
 /*
@@ -64,10 +66,46 @@ void cargarDocumentos (char* nombreLibros)
 {
 
 }
+void BuscarPorPalabra(char* palabra)
+{
+    tipoLibro* libro = firstMap(MapaLibros);
+    int cont_libros = 0;
+    int aux_relevancia;
+    int total_libros = 0;
+    //primero debo calcular en cuantos documentos se encuentra la palabra
+    while(libro != NULL)
+    {
+        tipoPalabra* buscador_palabra = searchMap(libro->mapaPalabras, palabra);
+        if(buscador_palabra != NULL)
+        {
+            cont_libros++;
+        }
+        total_libros++;
+        libro = nextMap(MapaLibros);
+    }
+    
+    while(libro != NULL)
+    {
+        tipoPalabra* buscador_palabra = searchMap(libro->mapaPalabras, palabra);
+        
+        if(buscador_palabra->relevancia == 0)
+        {
+            aux_relevancia = ((buscador_palabra->apariciones) / (libro->cantPalabras)) * (log(total_libros/cont_libros));
+            buscador_palabra->relevancia = aux_relevancia;
+        }
+        libro = nextMap(MapaLibros);
+    }
+
+}
+
+
+
+
 
 int main()
 {
     char* nombreLibros = (char*) malloc (sizeof(char));
+    char* palabra = (char*) malloc (100*sizeof(char));
     int option;
 
     //Creación de menú
@@ -97,7 +135,11 @@ int main()
                     break;
             case 4: printf("FUNCION NO IMPLEMENTADA!\n");
                     break;
-            case 5: printf("FUNCION NO IMPLEMENTADA!\n");
+            case 5: getchar();
+                    printf("Ingrese la palabra que desea buscar\n");
+                    scanf("%100[^\n]s", palabra);
+                    BuscarPorPalabra(palabra, );
+
                     break;
             case 6: printf("FUNCION NO IMPLEMENTADA!\n");
                     break;
