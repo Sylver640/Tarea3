@@ -76,21 +76,29 @@ void cargarDocumentos (char* idLibros, Map* mapaLibrosPorID, TreeMap* mapaLibros
 {
     char limit[2] = " ";
     char path[100];
+    char linea[1024];
+    char titulo[100];
     char* token = strtok(idLibros, limit);
     if (token != NULL)
     {
         while (token != NULL)
         {
-            snprintf(path, sizeof(path), "books/%s", token);
+            snprintf(path, sizeof(path), "books/%s.txt", token);
             FILE* texto = fopen(path, "rt");
             if (texto == NULL) 
             {
                 printf("Texto %s no encontrado!\n", path);
-                fclose(texto);
+                token = strtok(NULL, limit);
                 continue;
             }
             else 
                 printf("Archivo abierto con exito!\n");
+            
+            tipoLibro* nuevoTexto = (tipoLibro*) malloc (sizeof(tipoLibro));
+            nuevoTexto->id = atoi(token);
+            fgets(linea, 1023, texto);
+            //sscanf(linea, "%")
+            printf("%s\n", linea);
 
             token = strtok(NULL, limit);
         }
