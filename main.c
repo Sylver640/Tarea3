@@ -96,7 +96,7 @@ void cargarDocumentos (char* idLibros, Map* mapaLibrosPorID, TreeMap* mapaLibros
         }
     }
 }
-void BuscarPorPalabra(char* palabra, Map* MapaLibros)
+void BuscarPorPalabra(char* palabra, Map* MapaLibros, List* listaPrioridad)
 {
     tipoLibro* libro = firstMap(MapaLibros);
     int cont_libros = 0;
@@ -122,9 +122,19 @@ void BuscarPorPalabra(char* palabra, Map* MapaLibros)
         {
             aux_relevancia = ((buscador_palabra->apariciones) / (libro->cantPalabras)) * (log(total_libros/cont_libros));
             buscador_palabra->relevancia = aux_relevancia;
+            pushBack(listaPrioridad, buscador_palabra);
         }
         libro = nextMap(MapaLibros);
     }
+    //Ordenar la lista mediante Bubble Sort
+     
+    tipoPalabra* imprimir_libros = firstList(listaPrioridad);
+    while(imprimir_libros != NULL)
+    {
+        printf("%s\n", imprimir_libros->libroAsociado);
+        imprimir_libros = nextList(listaPrioridad);
+    }
+    
 
 }
 
@@ -136,6 +146,7 @@ int main()
     char* titulo = (char*) malloc (100*sizeof(char));
     char* palabra = (char*) malloc (100*sizeof(char));
     int option;
+    List* listaPrioridadPorPalabra = createList();
 
     //Creación de menú
     while (option != 0)
@@ -170,7 +181,7 @@ int main()
             case 5: getchar();
                     printf("Ingrese la palabra que desea buscar\n");
                     scanf("%100[^\n]s", palabra);
-                    BuscarPorPalabra(palabra, mapaLibrosPorID);
+                    BuscarPorPalabra(palabra, mapaLibrosPorID, listaPrioridadPorPalabra);
                     break;
             case 6: printf("FUNCION NO IMPLEMENTADA!\n");
                     break;
