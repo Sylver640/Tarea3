@@ -4,6 +4,7 @@
 #include <ctype.h>
 #include <stdbool.h>
 #include <math.h>
+#include <conio.h>
 #include "Map.h"
 #include "list.h"
 #include "treemap.h"
@@ -70,6 +71,29 @@ bool esComun (char* palabra)
                              "say", "her", "she", "or", "an", "will", "my", "one", "all", "would", "there", "their", "what", 
                              "so", "up", "out", "if", "about", "who", "get", "which", "go", "me", "when", "make", "can", "like", 
                              "no", "just", "him", "know", "take", "into", "your", "good", "some", "could", "us"};
+    for (int i = 0; i < 100; i++)
+    {
+        if (strcmp(palabra, commonWords[i]) == 0) 
+            return true;
+    }
+
+    return false;
+}
+
+char* next_word (FILE *f) {
+    char x[1024];
+    if (fscanf(f, " %1023s", x) == 1)
+        return strdup(x);
+    else
+        return NULL;
+}
+
+
+void contarPalabrasYCaracteres(FILE* texto, tipoLibro* nuevoLibro)
+{
+    tipoPalabra* palabra = (tipoPalabra*) malloc (sizeof(tipoPalabra));
+
+    
 }
 
 void cargarDocumentos (char* idLibros, Map* mapaLibrosPorID, TreeMap* mapaLibrosPorTitulo)
@@ -97,8 +121,14 @@ void cargarDocumentos (char* idLibros, Map* mapaLibrosPorID, TreeMap* mapaLibros
             tipoLibro* nuevoTexto = (tipoLibro*) malloc (sizeof(tipoLibro));
             nuevoTexto->id = atoi(token);
             fgets(linea, 1023, texto);
-            //sscanf(linea, "%")
-            printf("%s\n", linea);
+            
+            titulo[0] = '\0';
+            const char *start = strchr(linea, 'f') + 2;
+            strncat(titulo, start, strcspn(start, "\n"));
+            strcpy(nuevoTexto->titulo, titulo);
+            contarPalabrasYCaracteres(texto, nuevoTexto);
+
+            insertMap(mapaLibrosPorID, nuevoTexto->id, nuevoTexto);
 
             token = strtok(NULL, limit);
         }
@@ -179,6 +209,7 @@ int main()
                     printf("Ingrese el nombre de su archivo (si es mas de uno, separe con espacios): ");
                     scanf("%50[^\n]s", idLibros);
                     cargarDocumentos(idLibros, mapaLibrosPorID, mapaLibrosPorTitulo);
+                    //getch();
                     break;
             case 2: printf("FUNCION NO IMPLEMENTADA!\n");
                     break;
