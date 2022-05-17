@@ -3,6 +3,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <stdbool.h>
+#include <math.h>
 #include "Map.h"
 #include "list.h"
 #include "treemap.h"
@@ -62,11 +63,40 @@ int lower_than_int(void * key1, void * key2) {
     return 0;
 }
 
-void cargarDocumentos (char* nombreLibros)
+bool esComun (char* palabra)
 {
-
+    char* commonWords[100] = {"the", "be", "to", "of", "and", "a", "in", "that", "have", "I", "it", "for", "not", "on", 
+                             "with", "he", "as", "you", "do", "at", "this", "but", "his", "by", "from", "they", "we", 
+                             "say", "her", "she", "or", "an", "will", "my", "one", "all", "would", "there", "their", "what", 
+                             "so", "up", "out", "if", "about", "who", "get", "which", "go", "me", "when", "make", "can", "like", 
+                             "no", "just", "him", "know", "take", "into", "your", "good", "some", "could", "us"};
 }
-void BuscarPorPalabra(char* palabra)
+
+void cargarDocumentos (char* idLibros, Map* mapaLibrosPorID, TreeMap* mapaLibrosPorTitulo)
+{
+    char limit[2] = " ";
+    char path[100];
+    char* token = strtok(idLibros, limit);
+    if (token != NULL)
+    {
+        while (token != NULL)
+        {
+            snprintf(path, sizeof(path), "books/%s", token);
+            FILE* texto = fopen(path, "rt");
+            if (texto == NULL) 
+            {
+                printf("Texto %s no encontrado!\n", path);
+                fclose(texto);
+                continue;
+            }
+            else 
+                printf("Archivo abierto con exito!\n");
+
+            token = strtok(NULL, limit);
+        }
+    }
+}
+void BuscarPorPalabra(char* palabra, Map* MapaLibros)
 {
     tipoLibro* libro = firstMap(MapaLibros);
     int cont_libros = 0;
@@ -98,13 +128,12 @@ void BuscarPorPalabra(char* palabra)
 
 }
 
-
-
-
-
 int main()
 {
-    char* nombreLibros = (char*) malloc (sizeof(char));
+    Map* mapaLibrosPorID = createMap(lower_than_int);
+    TreeMap* mapaLibrosPorTitulo = createTreeMap(lower_than_string);
+    char* idLibros = (char*) malloc (50*sizeof(char));
+    char* titulo = (char*) malloc (100*sizeof(char));
     char* palabra = (char*) malloc (100*sizeof(char));
     int option;
 
@@ -127,7 +156,10 @@ int main()
 
         switch(option)
         {
-            case 1: printf("FUNCION NO IMPLEMENTADA!\n");
+            case 1: getchar();
+                    printf("Ingrese el nombre de su archivo (si es mas de uno, separe con espacios): ");
+                    scanf("%50[^\n]s", idLibros);
+                    cargarDocumentos(idLibros, mapaLibrosPorID, mapaLibrosPorTitulo);
                     break;
             case 2: printf("FUNCION NO IMPLEMENTADA!\n");
                     break;
@@ -138,8 +170,7 @@ int main()
             case 5: getchar();
                     printf("Ingrese la palabra que desea buscar\n");
                     scanf("%100[^\n]s", palabra);
-                    BuscarPorPalabra(palabra, );
-
+                    BuscarPorPalabra(palabra, mapaLibrosPorID);
                     break;
             case 6: printf("FUNCION NO IMPLEMENTADA!\n");
                     break;
