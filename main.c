@@ -136,6 +136,7 @@ void contarPalabrasYCaracteres(FILE* texto, tipoLibro* nuevoLibro)
         
         if (!esComun(palabra) && palabra[0] != '\0')
         {
+            //Quizá sea útil crear un auxiliar para recorrer las palabras
             if (searchMap(nuevoLibro->mapaPalabras, palabra) == NULL)
             {
                 nuevaPalabra->apariciones = 1;
