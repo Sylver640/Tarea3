@@ -117,6 +117,7 @@ char* quitarCaracteres(char* string, char* c)
 
 void contarPalabrasYCaracteres(FILE* texto, tipoLibro* nuevoLibro)
 {
+    tipoPalabra* nuevaPalabra = (tipoPalabra*) malloc (sizeof(tipoPalabra));
     char* palabra = (char*) malloc (100*sizeof(char));
     palabra = next_word(texto);
     for (int i = 0; palabra[i]; i++)
@@ -127,23 +128,25 @@ void contarPalabrasYCaracteres(FILE* texto, tipoLibro* nuevoLibro)
         for (int i = 0; palabra[i]; i++)
             palabra[i] = tolower(palabra[i]);
         palabra = quitarCaracteres(palabra, "!?,;""':.1234567890/()-*¨{}[]<>|$%&");
+
         nuevoLibro->cantPalabras++;
+        for (int i = 0; i < strlen(palabra); i++)
+            nuevoLibro->cantCaracteres++;
+        
+        
         if (!esComun(palabra) && palabra[0] != '\0')
         {
-            if (nuevoLibro->mapaPalabras == NULL) 
-                nuevoLibro->mapaPalabras = createMap(lower_than_string);
-            
             if (searchMap(nuevoLibro->mapaPalabras, palabra) == NULL)
             {
-                tipoPalabra* nuevaPalabra = (tipoPalabra*) malloc (sizeof(tipoPalabra));
                 nuevaPalabra->apariciones = 1;
                 strcpy(nuevaPalabra->palabra, palabra);
                 nuevaPalabra->relevancia = 0;
                 insertMap(nuevoLibro->mapaPalabras, palabra, nuevaPalabra);
             }
+
             if (searchMap(nuevoLibro->mapaPalabras, palabra) != NULL)
             {
-                //printf("se encuentra palabra repetida\n");
+                printf("se encuentra palabra repetida\n");
             }
         }
         palabra = next_word(texto);
@@ -182,9 +185,13 @@ void cargarDocumentos (char* idLibros, Map* mapaLibrosPorID, TreeMap* mapaLibros
             strcpy(nuevoTexto->titulo, titulo);
             nuevoTexto->cantCaracteres = 0;
             nuevoTexto->cantPalabras = 0;
+            nuevoTexto->mapaPalabras = createMap(is_equal_string);
             contarPalabrasYCaracteres(texto, nuevoTexto);
 
             printf("cantidad de palabras texto: %ld\n", nuevoTexto->cantPalabras);
+            printf("cantidad de caracteres texto: %ld\n", nuevoTexto->cantCaracteres);
+            tipoPalabra* prueba = firstMap(nuevoTexto->mapaPalabras);
+            printf("primera palabra: %s\n", prueba->palabra);
 
             insertMap(mapaLibrosPorID, nuevoTexto->id, nuevoTexto);
             insertTreeMap(mapaLibrosPorTitulo, nuevoTexto->titulo, nuevoTexto);
@@ -201,11 +208,15 @@ void BuscarPorPalabra(char* palabra, Map* MapaLibros, List* listaPrioridad)
     int aux_relevancia;
     int total_libros = 0;
     //primero debo calcular en cuantos documentos se encuentra la palabra
+    tipoPalabra* palabraprueba = firstMap(libro->mapaPalabras);
+    printf("primera palabra: %s\n", palabraprueba->palabra);
     while(libro != NULL)
     {
+        printf("entra al while\n");
         tipoPalabra* buscador_palabra = searchMap(libro->mapaPalabras, palabra);
-        if(buscador_palabra != NULL)
+        if(buscador_palabra != NULL && strcmp(buscador_palabra->palabra, palabra) == 0)
         {
+            printf("se encuentra libro con palabra\n");
             cont_libros++;
         }
         total_libros++;
@@ -238,8 +249,8 @@ void BuscarPorPalabra(char* palabra, Map* MapaLibros, List* listaPrioridad)
 
 int main()
 {
-    Map* mapaLibrosPorID = createMap(lower_than_string);
-    TreeMap* mapaLibrosPorTitulo = createTreeMap(lower_than_string);
+    Map* mapaLibrosPorID = createMap(is_equal_string);
+    TreeMap* mapaLibrosPorTitulo = createTreeMap(is_equal_string);
     char* idLibros = (char*) malloc (50*sizeof(char));
     char* titulo = (char*) malloc (100*sizeof(char));
     char* palabra = (char*) malloc (100*sizeof(char));
