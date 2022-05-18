@@ -11,7 +11,7 @@
 
 typedef struct
 {
-    int id;
+    char id[50];
     char titulo[100];
     long cantPalabras;
     long cantCaracteres;
@@ -66,13 +66,16 @@ int lower_than_int(void * key1, void * key2) {
 
 bool esComun (char* palabra)
 {
-    char* commonWords[100] = {"the", "be", "to", "of", "and", "a", "in", "that", "have", "I", "it", "for", "not", "on", 
+    char* commonWords[100] = {"the", "be", "to", "of", "and", "a", "in", "that", "have", "i", "it", "for", "not", "on", 
                              "with", "he", "as", "you", "do", "at", "this", "but", "his", "by", "from", "they", "we", 
                              "say", "her", "she", "or", "an", "will", "my", "one", "all", "would", "there", "their", "what", 
                              "so", "up", "out", "if", "about", "who", "get", "which", "go", "me", "when", "make", "can", "like", 
-                             "no", "just", "him", "know", "take", "into", "your", "good", "some", "could", "us"};
+                             "no", "just", "him", "know", "take", "into", "your", "good", "some", "could", "them", "than", "then", 
+                             "now", "come", "its", "i'ts", "also", "how", "our", "well", "even", "want", "because", "any", "this", 
+                             "most", "us", "are", "is"};
     for (int i = 0; i < 100; i++)
     {
+        if (commonWords[i] == NULL) break;
         if (strcmp(palabra, commonWords[i]) == 0) 
             return true;
     }
@@ -88,12 +91,63 @@ char* next_word (FILE *f) {
         return NULL;
 }
 
+int hayQueEliminar (char c, char* string_chars)
+{
+    for (int i = 0; i < strlen(string_chars); i++)
+        if (string_chars[i] == c) return 1;
+    return 0;
+}
+
+char* quitarCaracteres(char* string, char* c)
+{
+    int i, k;
+    for (i = 0; i < strlen(string); i++)
+    {
+        if (hayQueEliminar(string[i], c))
+        {
+            for (k = i; k < strlen(string)-1; k++)
+                string[k] = string[k+1];
+            string[k] = '\0';
+            i--;
+        }
+    }
+
+    return string;
+}
 
 void contarPalabrasYCaracteres(FILE* texto, tipoLibro* nuevoLibro)
 {
-    tipoPalabra* palabra = (tipoPalabra*) malloc (sizeof(tipoPalabra));
-
-    
+    char* palabra = (char*) malloc (100*sizeof(char));
+    palabra = next_word(texto);
+    for (int i = 0; palabra[i]; i++)
+        palabra[i] = tolower(palabra[i]);
+    int k = 0;
+    while (palabra)
+    {
+        for (int i = 0; palabra[i]; i++)
+            palabra[i] = tolower(palabra[i]);
+        palabra = quitarCaracteres(palabra, "!?,;""':.1234567890/()-*¨{}[]<>|$%&");
+        nuevoLibro->cantPalabras++;
+        if (!esComun(palabra) && palabra[0] != '\0')
+        {
+            if (nuevoLibro->mapaPalabras == NULL) 
+                nuevoLibro->mapaPalabras = createMap(lower_than_string);
+            
+            if (searchMap(nuevoLibro->mapaPalabras, palabra) == NULL)
+            {
+                tipoPalabra* nuevaPalabra = (tipoPalabra*) malloc (sizeof(tipoPalabra));
+                nuevaPalabra->apariciones = 1;
+                strcpy(nuevaPalabra->palabra, palabra);
+                nuevaPalabra->relevancia = 0;
+                insertMap(nuevoLibro->mapaPalabras, palabra, nuevaPalabra);
+            }
+            if (searchMap(nuevoLibro->mapaPalabras, palabra) != NULL)
+            {
+                //printf("se encuentra palabra repetida\n");
+            }
+        }
+        palabra = next_word(texto);
+    }
 }
 
 void cargarDocumentos (char* idLibros, Map* mapaLibrosPorID, TreeMap* mapaLibrosPorTitulo)
@@ -116,24 +170,30 @@ void cargarDocumentos (char* idLibros, Map* mapaLibrosPorID, TreeMap* mapaLibros
                 continue;
             }
             else 
-                printf("Archivo abierto con exito!\n");
+                printf("Texto %s abierto con exito!\n", path);
             
             tipoLibro* nuevoTexto = (tipoLibro*) malloc (sizeof(tipoLibro));
-            nuevoTexto->id = atoi(token);
+            strcpy(nuevoTexto->id, token);
             fgets(linea, 1023, texto);
             
             titulo[0] = '\0';
             const char *start = strchr(linea, 'f') + 2;
             strncat(titulo, start, strcspn(start, "\n"));
             strcpy(nuevoTexto->titulo, titulo);
+            nuevoTexto->cantCaracteres = 0;
+            nuevoTexto->cantPalabras = 0;
             contarPalabrasYCaracteres(texto, nuevoTexto);
 
+            printf("cantidad de palabras texto: %ld\n", nuevoTexto->cantPalabras);
+
             insertMap(mapaLibrosPorID, nuevoTexto->id, nuevoTexto);
+            insertTreeMap(mapaLibrosPorTitulo, nuevoTexto->titulo, nuevoTexto);
 
             token = strtok(NULL, limit);
         }
     }
 }
+
 void BuscarPorPalabra(char* palabra, Map* MapaLibros, List* listaPrioridad)
 {
     tipoLibro* libro = firstMap(MapaLibros);
@@ -178,7 +238,7 @@ void BuscarPorPalabra(char* palabra, Map* MapaLibros, List* listaPrioridad)
 
 int main()
 {
-    Map* mapaLibrosPorID = createMap(lower_than_int);
+    Map* mapaLibrosPorID = createMap(lower_than_string);
     TreeMap* mapaLibrosPorTitulo = createTreeMap(lower_than_string);
     char* idLibros = (char*) malloc (50*sizeof(char));
     char* titulo = (char*) malloc (100*sizeof(char));
@@ -217,12 +277,12 @@ int main()
                     break;
             case 4: printf("FUNCION NO IMPLEMENTADA!\n");
                     break;
-            case 5: getchar();
+            case 5: printf("FUNCION NO IMPLEMENTADA!\n");
+                    break;
+            case 6: getchar();
                     printf("Ingrese la palabra que desea buscar\n");
                     scanf("%100[^\n]s", palabra);
                     BuscarPorPalabra(palabra, mapaLibrosPorID, listaPrioridadPorPalabra);
-                    break;
-            case 6: printf("FUNCION NO IMPLEMENTADA!\n");
                     break;
             case 7: printf("FUNCION NO IMPLEMENTADA!\n");
                     break;
