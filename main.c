@@ -248,6 +248,17 @@ void BuscarPorPalabra(char* palabra, Map* MapaLibros, List* listaPrioridad)
 
 }
 
+void mostrarDocsOrdenados(Map* mapaLibrosPorID){
+    tipoLibro* IDActual = firstMap(mapaLibrosPorID); //Variable que ayudará a recorrer los documentos.
+
+    //Si la primera posición es vacía, no hay documentos cargados.
+    if(IDActual==NULL){
+        printf("\nNo existen documentos cargados!\n"); 
+        return;
+    }
+
+}
+
 int main()
 {
     Map* mapaLibrosPorID = createMap(is_equal_string);
@@ -283,7 +294,7 @@ int main()
                     cargarDocumentos(idLibros, mapaLibrosPorID, mapaLibrosPorTitulo);
                     //getch();
                     break;
-            case 2: printf("FUNCION NO IMPLEMENTADA!\n");
+            case 2: mostrarDocsOrdenados(mapaLibrosPorID);
                     break;
             case 3: printf("FUNCION NO IMPLEMENTADA!\n");
                     break;
