@@ -213,10 +213,7 @@ void BuscarPorPalabra(char* palabra, Map* MapaLibros, List* listaPrioridad)
 {
     tipoLibro* libro = firstMap(MapaLibros);
     int cont_libros = 0;
-    int aux_relevancia;
     int total_libros = 0;
-    //primero debo calcular en cuantos documentos se encuentra la palabra
-    tipoPalabra* palabraprueba = firstMap(libro->mapaPalabras);
     while(libro != NULL)
     {
         tipoPalabra* buscador_palabra = searchMap(libro->mapaPalabras, palabra);
@@ -228,29 +225,10 @@ void BuscarPorPalabra(char* palabra, Map* MapaLibros, List* listaPrioridad)
         total_libros++;
         libro = nextMap(MapaLibros);
     }
-    
-    /*while(libro != NULL)
+    if(cont_libros == 0)
     {
-        tipoPalabra* buscador_palabra = searchMap(libro->mapaPalabras, palabra);
-        
-        if(buscador_palabra->relevancia == 0)
-        {
-            aux_relevancia = ((buscador_palabra->apariciones) / (libro->cantPalabras)) * (log(total_libros/cont_libros));
-            buscador_palabra->relevancia = aux_relevancia;
-            pushBack(listaPrioridad, buscador_palabra);
-        }
-        libro = nextMap(MapaLibros);
-    }*/
-    //Ordenar la lista mediante Bubble Sort
-     
-   /* tipoPalabra* imprimir_libros = firstList(listaPrioridad);
-    while(imprimir_libros != NULL)
-    {
-        printf("%s\n", imprimir_libros->libroAsociado);
-        imprimir_libros = nextList(listaPrioridad);
-    }*/
-    
-
+        printf("La palabra ingresada no se encuentra en ningún libro\n");
+    }
 }
 
 void mostrarDocsOrdenados(Map* mapaLibrosPorID){
