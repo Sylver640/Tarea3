@@ -257,6 +257,15 @@ void mostrarDocsOrdenados(Map* mapaLibrosPorID){
         return;
     }
 
+    //De lo contrario, se procede a mostrar los datos de todos los documentos.
+    while(IDActual != NULL){
+        printf("ID: %s\nTitulo: %s\nNumero de palabras: %d\nNumero de caracteres: %d\n\n", IDActual->id, IDActual->titulo, IDActual->cantPalabras,IDActual->cantCaracteres);
+        IDActual=nextMap(mapaLibrosPorID);
+    } 
+
+    //Al finalizar de recorrer todos los documentos, se avisa al usuario y se retorna al menú.
+    printf("Todos los documentos han sido procesados correctamente!\n");
+
 }
 
 int main()
