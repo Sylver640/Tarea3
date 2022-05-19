@@ -24,8 +24,7 @@ typedef struct
     char palabra[100];
     int relevancia;
     List* lineaPalabra;
-    List* libroAsociado;
-    
+    List* libroAsociado; //Al final será útil esto??
 } tipoPalabra;
 
 /*
@@ -117,17 +116,18 @@ char* quitarCaracteres(char* string, char* c)
 
 void contarPalabrasYCaracteres(FILE* texto, tipoLibro* nuevoLibro)
 {
-    tipoPalabra* nuevaPalabra = (tipoPalabra*) malloc (sizeof(tipoPalabra));
+    tipoPalabra* palabraAuxiliar = (tipoPalabra*) malloc (sizeof(tipoPalabra));
     char* palabra = (char*) malloc (100*sizeof(char));
     palabra = next_word(texto);
     for (int i = 0; palabra[i]; i++)
         palabra[i] = tolower(palabra[i]);
     int k = 0;
+    int repetidas = 1;
     while (palabra)
     {
         for (int i = 0; palabra[i]; i++)
             palabra[i] = tolower(palabra[i]);
-        palabra = quitarCaracteres(palabra, "!?,;""':.1234567890/()-*¨{}[]<>|$%&");
+        palabra = quitarCaracteres(palabra, "!?,;""':.1234567890/()-*¨{}[]<>|$%&_^°¬¿¡ÔÇ£ÔÇØ#&=~+’“”");
 
         nuevoLibro->cantPalabras++;
         for (int i = 0; i < strlen(palabra); i++)
@@ -136,9 +136,11 @@ void contarPalabrasYCaracteres(FILE* texto, tipoLibro* nuevoLibro)
         
         if (!esComun(palabra) && palabra[0] != '\0')
         {
-            //Quizá sea útil crear un auxiliar para recorrer las palabras
             if (searchMap(nuevoLibro->mapaPalabras, palabra) == NULL)
             {
+                tipoPalabra* nuevaPalabra = (tipoPalabra*) malloc (sizeof(tipoPalabra));
+                nuevaPalabra->lineaPalabra = createList();
+                ftell(texto);
                 nuevaPalabra->apariciones = 1;
                 strcpy(nuevaPalabra->palabra, palabra);
                 nuevaPalabra->relevancia = 0;
@@ -147,7 +149,8 @@ void contarPalabrasYCaracteres(FILE* texto, tipoLibro* nuevoLibro)
 
             if (searchMap(nuevoLibro->mapaPalabras, palabra) != NULL)
             {
-                printf("se encuentra palabra repetida\n");
+                palabraAuxiliar = searchMap(nuevoLibro->mapaPalabras, palabra);
+                palabraAuxiliar->apariciones++;
             }
         }
         palabra = next_word(texto);
@@ -189,14 +192,18 @@ void cargarDocumentos (char* idLibros, Map* mapaLibrosPorID, TreeMap* mapaLibros
             nuevoTexto->mapaPalabras = createMap(is_equal_string);
             contarPalabrasYCaracteres(texto, nuevoTexto);
 
-            printf("cantidad de palabras texto: %ld\n", nuevoTexto->cantPalabras);
-            printf("cantidad de caracteres texto: %ld\n", nuevoTexto->cantCaracteres);
-            tipoPalabra* prueba = firstMap(nuevoTexto->mapaPalabras);
-            printf("primera palabra: %s\n", prueba->palabra);
+            /*tipoPalabra* prueba = firstMap(nuevoTexto->mapaPalabras);
+            while (prueba != NULL)
+            {
+                printf("palabra: %s\n", prueba->palabra);
+                printf("apariciones de %s: %d\n", prueba->palabra, prueba->apariciones);
+                prueba = nextMap(nuevoTexto->mapaPalabras);
+            }*/
 
             insertMap(mapaLibrosPorID, nuevoTexto->id, nuevoTexto);
             insertTreeMap(mapaLibrosPorTitulo, nuevoTexto->titulo, nuevoTexto);
 
+            fclose(texto);
             token = strtok(NULL, limit);
         }
     }
