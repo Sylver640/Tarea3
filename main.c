@@ -231,8 +231,9 @@ void BuscarPorPalabra(char* palabra, Map* MapaLibros, List* listaPrioridad)
     }
 }
 
-void mostrarDocsOrdenados(Map* mapaLibrosPorID){
-    tipoLibro* IDActual = firstMap(mapaLibrosPorID); //Variable que ayudará a recorrer los documentos.
+void mostrarDocsOrdenados(TreeMap* mapaLibrosPorTitulo){
+    tipoLibro* IDActual = (tipoLibro*)malloc(sizeof(tipoLibro));
+    IDActual = firstTreeMap(mapaLibrosPorTitulo); //Variable que ayudará a recorrer los documentos.
 
     //Si la primera posición es vacía, no hay documentos cargados.
     if(IDActual==NULL){
@@ -243,7 +244,7 @@ void mostrarDocsOrdenados(Map* mapaLibrosPorID){
     //De lo contrario, se procede a mostrar los datos de todos los documentos.
     while(IDActual != NULL){
         printf("ID: %s\nTitulo: %s\nNumero de palabras: %d\nNumero de caracteres: %d\n\n", IDActual->id, IDActual->titulo, IDActual->cantPalabras,IDActual->cantCaracteres);
-        IDActual=nextMap(mapaLibrosPorID);
+        IDActual=nextTreeMap(mapaLibrosPorTitulo);
     } 
 
     //Al finalizar de recorrer todos los documentos, se avisa al usuario y se retorna al menú.
@@ -286,7 +287,7 @@ int main()
                     cargarDocumentos(idLibros, mapaLibrosPorID, mapaLibrosPorTitulo);
                     //getch();
                     break;
-            case 2: mostrarDocsOrdenados(mapaLibrosPorID);
+            case 2: mostrarDocsOrdenados(mapaLibrosPorTitulo);
                     break;
             case 3: printf("FUNCION NO IMPLEMENTADA!\n");
                     break;
