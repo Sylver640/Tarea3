@@ -253,6 +253,21 @@ void mostrarDocsOrdenados(TreeMap* LibrosPorTitulo){
 
 }
 
+void buscarLibroPorTitulo(TreeMap* LibrosPorTitulo, char* tituloLibro){
+    Pair* TituloActual = searchTreeMap(LibrosPorTitulo, tituloLibro);
+    
+    if(!TituloActual){
+        printf("No se ha encontrado el libro con dicho titulo.");
+        return;
+    }
+    else{
+        printf("Su libro ha sido encontrado.\n");
+        tipoLibro* datosLibro = TituloActual->value;
+        printf("Titulo: %s\nCantidad de palabras: %d\nCantidad de caracteres: %d\n\n", datosLibro->titulo, datosLibro->cantPalabras, datosLibro->cantCaracteres);
+    }
+
+}
+
 void mostrarContexto(char* titulo, char* palabra, TreeMap* mapaLibrosPorTitulo)
 {
     
@@ -295,7 +310,10 @@ int main()
                     break;
             case 2: mostrarDocsOrdenados(mapaLibrosPorTitulo);
                     break;
-            case 3: printf("FUNCION NO IMPLEMENTADA!\n");
+            case 3: printf("Ingrese el titulo del libro a buscar: \n");
+                    scanf("%s", &titulo);
+                    getchar();
+                    buscarLibroPorTitulo(mapaLibrosPorTitulo, titulo);
                     break;
             case 4: printf("FUNCION NO IMPLEMENTADA!\n");
                     break;
