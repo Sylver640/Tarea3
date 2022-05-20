@@ -4,7 +4,6 @@
 #include <ctype.h>
 #include <stdbool.h>
 #include <math.h>
-#include <conio.h>
 #include "Map.h"
 #include "list.h"
 #include "treemap.h"
@@ -162,7 +161,7 @@ void cargarDocumentos (char* idLibros, Map* mapaLibrosPorID, TreeMap* mapaLibros
     char limit[2] = " ";
     char path[100];
     char linea[1024];
-    char titulo[100];
+    char* titulo = (char*) malloc (100*sizeof(char));
     char* token = strtok(idLibros, limit);
     if (token != NULL)
     {
@@ -186,19 +185,12 @@ void cargarDocumentos (char* idLibros, Map* mapaLibrosPorID, TreeMap* mapaLibros
             titulo[0] = '\0';
             const char *start = strchr(linea, 'f') + 2;
             strncat(titulo, start, strcspn(start, "\n"));
+            titulo = quitarCaracteres(titulo, ";""'/()-*¨{}[]<>|$%&_^°¬¿¡ÔÇ£ÔÇØ#&=~+’“”");
             strcpy(nuevoTexto->titulo, titulo);
             nuevoTexto->cantCaracteres = 0;
             nuevoTexto->cantPalabras = 0;
             nuevoTexto->mapaPalabras = createMap(is_equal_string);
             contarPalabrasYCaracteres(texto, nuevoTexto);
-
-            /*tipoPalabra* prueba = firstMap(nuevoTexto->mapaPalabras);
-            while (prueba != NULL)
-            {
-                printf("palabra: %s\n", prueba->palabra);
-                printf("apariciones de %s: %d\n", prueba->palabra, prueba->apariciones);
-                prueba = nextMap(nuevoTexto->mapaPalabras);
-            }*/
 
             insertMap(mapaLibrosPorID, nuevoTexto->id, nuevoTexto);
             insertTreeMap(mapaLibrosPorTitulo, nuevoTexto->titulo, nuevoTexto);
@@ -306,7 +298,6 @@ int main()
                     printf("Ingrese el nombre de su archivo (si es mas de uno, separe con espacios): ");
                     scanf("%50[^\n]s", idLibros);
                     cargarDocumentos(idLibros, mapaLibrosPorID, mapaLibrosPorTitulo);
-                    //getch();
                     break;
             case 2: mostrarDocsOrdenados(mapaLibrosPorTitulo);
                     break;
