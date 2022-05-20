@@ -245,18 +245,17 @@ void mostrarDocsOrdenados(TreeMap* LibrosPorTitulo){
 
 }
 
-void buscarLibroPorTitulo(TreeMap* LibrosPorTitulo, char* tituloLibro){
-    Pair* TituloActual = searchTreeMap(LibrosPorTitulo, tituloLibro);
+void buscarLibroPorTitulo(TreeMap* LibrosPorTitulo, char* palabrasTitulo){
+    Pair* TituloActual = firstTreeMap(LibrosPorTitulo); //Se comienza a analizar el primer documento.
+    char limit[2] = " ";
+    char* token = strtok(palabrasTitulo, limit);
     
-    if(!TituloActual){
-        printf("No se ha encontrado el libro con dicho titulo.");
+    if(!TituloActual){ //Si no hay un primer documento, es porque no hay cargados en el programa.
+        printf("No existen documentados cargados.\n\n");
         return;
     }
-    else{
-        printf("Su libro ha sido encontrado.\n");
-        tipoLibro* datosLibro = TituloActual->value;
-        printf("Titulo: %s\nCantidad de palabras: %ld\nCantidad de caracteres: %ld\n\n", datosLibro->titulo, datosLibro->cantPalabras, datosLibro->cantCaracteres);
-    }
+
+    
 
 }
 
@@ -302,7 +301,7 @@ int main()
             case 2: mostrarDocsOrdenados(mapaLibrosPorTitulo);
                     break;
             case 3: getchar();
-                    printf("Ingrese el titulo del libro a buscar: \n");
+                    printf("Ingrese palabras separadas por espacios, el algoritmo buscar titulos que las contengan: \n");
                     scanf("%100[^\n]s", titulo);
                     getchar();
                     buscarLibroPorTitulo(mapaLibrosPorTitulo, titulo);
