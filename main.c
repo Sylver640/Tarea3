@@ -244,7 +244,7 @@ void mostrarDocsOrdenados(TreeMap* LibrosPorTitulo){
     //De lo contrario, se procede a mostrar los datos de todos los documentos en orden alfabético por título.
     while(IDActual != NULL){
         libroAuxiliar = IDActual->value;
-        printf("Titulo: %s\nCantidad de palabras: %d\nCantidad de caracteres: %d\n\n", libroAuxiliar->titulo, libroAuxiliar->cantPalabras, libroAuxiliar->cantCaracteres);
+        printf("Titulo: %s\nCantidad de palabras: %ld\nCantidad de caracteres: %ld\n\n", libroAuxiliar->titulo, libroAuxiliar->cantPalabras, libroAuxiliar->cantCaracteres);
         IDActual = nextTreeMap(LibrosPorTitulo);
     } 
 
@@ -263,7 +263,7 @@ void buscarLibroPorTitulo(TreeMap* LibrosPorTitulo, char* tituloLibro){
     else{
         printf("Su libro ha sido encontrado.\n");
         tipoLibro* datosLibro = TituloActual->value;
-        printf("Titulo: %s\nCantidad de palabras: %d\nCantidad de caracteres: %d\n\n", datosLibro->titulo, datosLibro->cantPalabras, datosLibro->cantCaracteres);
+        printf("Titulo: %s\nCantidad de palabras: %ld\nCantidad de caracteres: %ld\n\n", datosLibro->titulo, datosLibro->cantPalabras, datosLibro->cantCaracteres);
     }
 
 }
@@ -310,8 +310,9 @@ int main()
                     break;
             case 2: mostrarDocsOrdenados(mapaLibrosPorTitulo);
                     break;
-            case 3: printf("Ingrese el titulo del libro a buscar: \n");
-                    scanf("%s", &titulo);
+            case 3: getchar();
+                    printf("Ingrese el titulo del libro a buscar: \n");
+                    scanf("%100[^\n]s", titulo);
                     getchar();
                     buscarLibroPorTitulo(mapaLibrosPorTitulo, titulo);
                     break;
