@@ -231,9 +231,8 @@ void BuscarPorPalabra(char* palabra, Map* MapaLibros, List* listaPrioridad)
     }
 }
 
-void mostrarDocsOrdenados(TreeMap* mapaLibrosPorTitulo){
-    tipoLibro* IDActual = (tipoLibro*)malloc(sizeof(tipoLibro));
-    IDActual = firstTreeMap(mapaLibrosPorTitulo); //Variable que ayudará a recorrer los documentos.
+void mostrarDocsOrdenados(TreeMap* LibrosPorTitulo){
+    Pair* IDActual = firstTreeMap(LibrosPorTitulo); //Variable que ayudará a recorrer los documentos.
 
     //Si la primera posición es vacía, no hay documentos cargados.
     if(IDActual==NULL){
@@ -243,8 +242,9 @@ void mostrarDocsOrdenados(TreeMap* mapaLibrosPorTitulo){
 
     //De lo contrario, se procede a mostrar los datos de todos los documentos.
     while(IDActual != NULL){
-        printf("ID: %s\nTitulo: %s\nNumero de palabras: %d\nNumero de caracteres: %d\n\n", IDActual->id, IDActual->titulo, IDActual->cantPalabras,IDActual->cantCaracteres);
-        IDActual=nextTreeMap(mapaLibrosPorTitulo);
+        printf("Titulo: %s\nCantidad de caracteres: %d\n\n", IDActual->key, IDActual->value);
+        //printf("ID: %s\nTitulo: %s\nNumero de palabras: %d\nNumero de caracteres: %d\n\n", IDActual->id, IDActual->titulo, IDActual->cantPalabras,IDActual->cantCaracteres);
+        IDActual = nextTreeMap(LibrosPorTitulo);
     } 
 
     //Al finalizar de recorrer todos los documentos, se avisa al usuario y se retorna al menú.
