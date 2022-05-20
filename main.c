@@ -131,7 +131,22 @@ void contarPalabrasYCaracteres(FILE* texto, tipoLibro* nuevoLibro)
         nuevoLibro->cantPalabras++;
         for (int i = 0; i < strlen(palabra); i++)
             nuevoLibro->cantCaracteres++;
-        
+        while (1)
+        {
+            int pos = ftell(texto);
+            if (fscanf(texto, "%1023s", palabra) == 1)
+                printf("%s: pos %d\n", palabra, pos);
+            else break;
+        }
+
+        /*
+        el procedimiento para el contexto debe ser:
+        1. buscar posición
+        2. en la variable contexto, pegar las 5 palabras que vienen antes
+        3. pegar luego la palabra en sí
+        4. pegar las 5 palabras que vienen después
+        5. agregar el string a la lista de frases
+        */
         
         if (!esComun(palabra) && palabra[0] != '\0')
         {
