@@ -233,16 +233,17 @@ void BuscarPorPalabra(char* palabra, Map* MapaLibros, List* listaPrioridad)
 
 void mostrarDocsOrdenados(TreeMap* LibrosPorTitulo){
     Pair* IDActual = firstTreeMap(LibrosPorTitulo); //Variable que ayudará a recorrer los documentos.
+    tipoLibro* libroAuxiliar = IDActual->value;
 
     //Si la primera posición es vacía, no hay documentos cargados.
-    if(IDActual==NULL){
+    if(libroAuxiliar==NULL){
         printf("\nNo existen documentos cargados!\n"); 
         return;
     }
 
     //De lo contrario, se procede a mostrar los datos de todos los documentos.
     while(IDActual != NULL){
-        printf("Titulo: %s\nCantidad de caracteres: %d\n\n", IDActual->key, IDActual->value);
+        printf("Titulo: %s\nCantidad de palabras: %d\nCantidad de caracteres: %d\n\n", libroAuxiliar->titulo, libroAuxiliar->cantPalabras, libroAuxiliar->cantCaracteres);
         //printf("ID: %s\nTitulo: %s\nNumero de palabras: %d\nNumero de caracteres: %d\n\n", IDActual->id, IDActual->titulo, IDActual->cantPalabras,IDActual->cantCaracteres);
         IDActual = nextTreeMap(LibrosPorTitulo);
     } 
@@ -252,10 +253,15 @@ void mostrarDocsOrdenados(TreeMap* LibrosPorTitulo){
 
 }
 
+void mostrarContexto(char* titulo, char* palabra, TreeMap* mapaLibrosPorTitulo)
+{
+    
+}
+
 int main()
 {
     Map* mapaLibrosPorID = createMap(is_equal_string);
-    TreeMap* mapaLibrosPorTitulo = createTreeMap(is_equal_string);
+    TreeMap* mapaLibrosPorTitulo = createTreeMap(lower_than_string);
     char* idLibros = (char*) malloc (50*sizeof(char));
     char* titulo = (char*) malloc (100*sizeof(char));
     char* palabra = (char*) malloc (100*sizeof(char));
