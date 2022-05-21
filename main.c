@@ -7,6 +7,7 @@
 #include "Map.h"
 #include "list.h"
 #include "treemap.h"
+#include "heap.h"
 
 typedef struct
 {
@@ -21,7 +22,7 @@ typedef struct
 {
     int apariciones;
     char palabra[100];
-    int relevancia;
+    float relevancia;
     List* lineaPalabra;
     List* libroAsociado; //Al final será útil esto??
 } tipoPalabra;
@@ -273,6 +274,62 @@ void buscarLibroPorTitulo(TreeMap* LibrosPorTitulo, char* palabrasTitulo){
     
 
 }
+void palabrasMasRelevantes(Map* MapaLibros)
+{
+    char nombre[100];
+    getchar();
+    printf("Ingrese el nombre del libro ");
+    scanf("%100[^\n]s", nombre);
+    //if(searchMap(MapaLibros, nombre) == NULL) return;
+    tipoLibro* libro = firstMap(MapaLibros);
+    tipoLibro* libroBuscado ;
+    while(libro != NULL)
+    {
+        if(strcmp(libro->titulo, nombre) == 0)
+        {
+            libroBuscado = libro ;
+            break;
+        }
+        libro = nextMap(MapaLibros);
+    }
+    libro = firstMap(MapaLibros);
+    if(libroBuscado == NULL) return;
+    Heap* monticuloRelevancia;
+    double totalLibros = 0;
+    double aparicionEnLibros = 0;
+     while(libro != NULL)
+    {
+        totalLibros++;
+        libro = nextMap(MapaLibros);
+    }
+    tipoPalabra* buscador_palabra = firstMap(libroBuscado->mapaPalabras);
+    while(buscador_palabra != NULL)
+    {
+        libro = firstMap(MapaLibros);
+        while(libro != NULL)
+        {
+            if(searchMap(libro->mapaPalabras, buscador_palabra) != NULL) 
+            {
+                aparicionEnLibros++;
+            }
+            libro = nextMap(MapaLibros);
+        }
+        if(buscador_palabra->relevancia == 0)
+        {
+            buscador_palabra->relevancia = ((buscador_palabra->apariciones) / (libro->cantPalabras)) * (log(totalLibros/aparicionEnLibros));
+        }
+        heap_push(monticuloRelevancia, buscador_palabra, buscador_palabra->relevancia );
+        buscador_palabra = nextMap(libroBuscado->mapaPalabras);
+    }  
+
+    for(int i = 0; i < 10; i++) 
+        {
+            tipoPalabra* palabra = heap_top(monticuloRelevancia);
+            heap_pop(monticuloRelevancia);
+            printf("%s: %lf\n", palabra->palabra, palabra->relevancia);
+        }
+
+}
 
 void mostrarContexto(char* titulo, char* palabra, TreeMap* mapaLibrosPorTitulo)
 {
@@ -323,7 +380,7 @@ int main()
                     break;
             case 4: printf("FUNCION NO IMPLEMENTADA!\n");
                     break;
-            case 5: printf("FUNCION NO IMPLEMENTADA!\n");
+            case 5: palabrasMasRelevantes(mapaLibrosPorID);
                     break;
             case 6: getchar();
                     printf("Ingrese la palabra que desea buscar\n");
