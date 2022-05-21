@@ -252,7 +252,7 @@ void mostrarDocsOrdenados(TreeMap* LibrosPorTitulo){
     //De lo contrario, se procede a mostrar los datos de todos los documentos en orden alfabético por título.
     while(IDActual != NULL){
         libroAuxiliar = IDActual->value;
-        printf("Titulo: %s\nCantidad de palabras: %ld\nCantidad de caracteres: %ld\n\n", libroAuxiliar->titulo, libroAuxiliar->cantPalabras, libroAuxiliar->cantCaracteres);
+        printf("ID: %s\nTitulo: %s\nCantidad de palabras: %ld\nCantidad de caracteres: %ld\n\n", libroAuxiliar->id, libroAuxiliar->titulo, libroAuxiliar->cantPalabras, libroAuxiliar->cantCaracteres);
         IDActual = nextTreeMap(LibrosPorTitulo);
     } 
 
@@ -275,6 +275,11 @@ void buscarLibroPorTitulo(TreeMap* LibrosPorTitulo, char* palabrasTitulo){
         return;
     }
 
+    if(palabrasTitulo == ""){ //Si no se introdujo ninguna palabra, se retorna al menú con un aviso al respecto.
+        printf("Por favor, introduzca una palabra la proxima vez.\n\n");
+        return;
+    }
+
     if (token != NULL) //Se procede con las palabras.
     {
         while(token != NULL){ //Se reconoce la cantidad de palabras ingresadas.
@@ -282,33 +287,32 @@ void buscarLibroPorTitulo(TreeMap* LibrosPorTitulo, char* palabrasTitulo){
             token = strtok(NULL, limit);
         }
 
-        printf("%d\n", cantPalabrasIngresadas);
-
         while(TituloActual != NULL){ //Mientras hayan documentos, se van analizando uno tras uno.
             contPalabras = 0;
             token = strtok(palabrasTitulo, limit); //Se regresa a la primera palabra tras cada libro.
+
             while (token != NULL)
             {
+              printf("%s ", token);
               datosLibro = TituloActual->value;
 
-              buscadorDePalabra = searchMap(datosLibro->mapaPalabras,token);
-              if(buscadorDePalabra != NULL){
+              buscadorDePalabra = searchMap(datosLibro->mapaPalabras,token); //Se busca la palabra dentro del libro.
+              if(buscadorDePalabra != NULL){ 
                 contPalabras++;
-              }
+              } //Si está en el libro, aumenta la cantidad de palabras presentes.
 
               printf("%d\n\n", contPalabras);
-
-              if(contPalabras == cantPalabrasIngresadas){
-                printf("%s\n", datosLibro->titulo);
-              }
-
-              token = strtok(NULL, limit);
+              token = strtok(NULL, limit); //Se pasa a la siguiente palabra.
             }
 
-            TituloActual = nextTreeMap(LibrosPorTitulo);
+            if(contPalabras == cantPalabrasIngresadas){ //Si las palabras presentes coinciden con las ingresadas, se muestra el libro que las contiene.
+                printf("%s\n", datosLibro->titulo);
+            }
+
+            TituloActual = nextTreeMap(LibrosPorTitulo); //Una vez terminado con el libro, se avanza al siguiente.
         }
 
-    } else printf("Por favor, introduzca una palabra la proxima vez.\n\n");
+    }
 
 }
 
