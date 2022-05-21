@@ -389,6 +389,13 @@ void mostrarContexto(char* titulo, char* palabra, TreeMap* mapaLibrosPorTitulo)
     }
 
     tipoLibro* textoCargado = searchData->value;
+
+    char* word;
+    if (searchMap(textoCargado->mapaPalabras, palabra) == NULL)
+    {
+        printf("La palabra indicada no esta en este texto\n");
+        return;
+    }
     /*
     el procedimiento para el contexto debe ser:
     1. ir a la posicion guardada en el mapa
@@ -397,30 +404,24 @@ void mostrarContexto(char* titulo, char* palabra, TreeMap* mapaLibrosPorTitulo)
     4. pegar las 5 palabras que vienen después
     5. agregar el string a la lista de frases
     */
-    char* word;
-    if (searchMap(textoCargado->mapaPalabras, palabra) == NULL)
+    //contexto[0] = '\0';
+    /*for (int i = 5; i > 0; i--)
     {
-        printf("La palabra indicada no esta en este texto\n");
-        return;
+        fseek(texto, (pos-i), SEEK_SET);
+        fscanf(texto, " %1023s", contextWord);
+        printf("palabra contextual %i posiciones antes: %s\n", i, contextWord);
+        strcat(contexto, contextWord);
     }
-                    //contexto[0] = '\0';
-                /*for (int i = 5; i > 0; i--)
-                {
-                    fseek(texto, (pos-i), SEEK_SET);
-                    fscanf(texto, " %1023s", contextWord);
-                    printf("palabra contextual %i posiciones antes: %s\n", i, contextWord);
-                    strcat(contexto, contextWord);
-                }
-                strcat(contexto, palabra);
-                for (int i = 0; i < 6; i++)
-                {
-                    fseek(texto, (pos+i), SEEK_SET);
-                    fscanf(texto, " %1023s", contextWord);
-                    printf("palabra contextual %i posiciones despues: %s\n", i, contextWord);
-                    strcat(contexto, contextWord);
-                }*/
-                //contexto = quitarCaracteres(contexto, """'/*¨{}[]<>|$%&_^°¬¿¡ÔÇ£ÔÇØ#&=~+’“”");
-                //printf("contexto de %s: %s\n", palabra, contexto);
+    strcat(contexto, palabra);
+    for (int i = 0; i < 6; i++)
+    {
+        fseek(texto, (pos+i), SEEK_SET);
+        fscanf(texto, " %1023s", contextWord);
+        printf("palabra contextual %i posiciones despues: %s\n", i, contextWord);
+        strcat(contexto, contextWord);
+    }*/
+    //contexto = quitarCaracteres(contexto, """'/*¨{}[]<>|$%&_^°¬¿¡ÔÇ£ÔÇØ#&=~+’“”");
+    //printf("contexto de %s: %s\n", palabra, contexto);
 }
 
 int main()
@@ -455,6 +456,7 @@ int main()
             case 1: getchar();
                     printf("Ingrese el nombre de su archivo (si es mas de uno, separe con espacios): ");
                     scanf("%50[^\n]s", idLibros);
+                    getchar();
                     cargarDocumentos(idLibros, mapaLibrosPorID, mapaLibrosPorTitulo);
                     break;
             case 2: mostrarDocsOrdenados(mapaLibrosPorTitulo);
@@ -474,7 +476,14 @@ int main()
                     scanf("%100[^\n]s", palabra);
                     BuscarPorPalabra(palabra, mapaLibrosPorID, listaPrioridadPorPalabra);
                     break;
-            case 7: printf("FUNCION NO IMPLEMENTADA!\n");
+            case 7: getchar();
+                    printf("Ingrese el titulo del libro: \n");
+                    scanf("%100[^\n]s", titulo);
+                    getchar();
+                    printf("Ingrese la palabra que desea buscar: \n");
+                    scanf("%100[^\n]s", palabra);
+                    getchar();
+                    mostrarContexto(titulo, palabra, mapaLibrosPorTitulo);
                     break;
             case 0: break;
         }
