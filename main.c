@@ -114,9 +114,8 @@ char* quitarCaracteres(char* string, char* c)
     return string;
 }
 
-int obtenerPosicion (char* palabra, FILE* f)
+/*int obtenerPosicion (char* palabra, FILE* f)
 {
-    //FILE* f = fopen("main.c", "r");
     int posicion;
     while (1)
     {
@@ -128,7 +127,7 @@ int obtenerPosicion (char* palabra, FILE* f)
     }
     return posicion;
     //pushBack(save->posicionPalabra, &posicion);
-}
+}*/
 
 void contarPalabrasYCaracteres(FILE* texto, tipoLibro* nuevoLibro)
 {
@@ -151,15 +150,16 @@ void contarPalabrasYCaracteres(FILE* texto, tipoLibro* nuevoLibro)
         
         if (!esComun(palabra) && palabra[0] != '\0')
         {
-            int posicion = obtenerPosicion(palabra, texto);
-            printf("busca la posicion\n");
+            //int posicion = obtenerPosicion(palabra, texto);
+            //printf("busca la posicion\n");
             if (searchMap(nuevoLibro->mapaPalabras, palabra) == NULL)
             {
                 tipoPalabra* nuevaPalabra = (tipoPalabra*) malloc (sizeof(tipoPalabra));
                 nuevaPalabra->posicionPalabra = createList();
-                pushBack(nuevaPalabra->posicionPalabra, &posicion);
+                long *posicion = malloc(sizeof(long));
+                *posicion = ftell(texto);
+                pushBack(nuevaPalabra->posicionPalabra, posicion);
                 nuevaPalabra->apariciones = 1;
-                printf("inicializa apariciones\n");
                 strcpy(nuevaPalabra->palabra, palabra);
                 nuevaPalabra->relevancia = 0;
                 insertMap(nuevoLibro->mapaPalabras, palabra, nuevaPalabra);
@@ -169,7 +169,9 @@ void contarPalabrasYCaracteres(FILE* texto, tipoLibro* nuevoLibro)
             {
                 palabraAuxiliar = searchMap(nuevoLibro->mapaPalabras, palabra);
                 palabraAuxiliar->apariciones++;
-                //pushBack(palabraAuxiliar->posicionPalabra, &posicion);
+                long *posicion = malloc(sizeof(long));
+                *posicion = ftell(texto);
+                pushBack(palabraAuxiliar->posicionPalabra, posicion);
             }
         }
         palabra = next_word(texto);
