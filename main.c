@@ -265,15 +265,53 @@ void buscarLibroPorTitulo(TreeMap* LibrosPorTitulo, char* palabrasTitulo){
     Pair* TituloActual = firstTreeMap(LibrosPorTitulo); //Se comienza a analizar el primer documento.
     char limit[2] = " ";
     char* token = strtok(palabrasTitulo, limit);
+    int contPalabras = 0;
+    tipoLibro* datosLibro;
+    int cantPalabrasIngresadas = 0;
+    tipoPalabra* buscadorDePalabra;
     
     if(!TituloActual){ //Si no hay un primer documento, es porque no hay cargados en el programa.
         printf("No existen documentados cargados.\n\n");
         return;
     }
 
-    
+    if (token != NULL) //Se procede con las palabras.
+    {
+        while(token != NULL){ //Se reconoce la cantidad de palabras ingresadas.
+            cantPalabrasIngresadas++;
+            token = strtok(NULL, limit);
+        }
+
+        printf("%d\n", cantPalabrasIngresadas);
+
+        while(TituloActual != NULL){ //Mientras hayan documentos, se van analizando uno tras uno.
+            contPalabras = 0;
+            token = strtok(palabrasTitulo, limit); //Se regresa a la primera palabra tras cada libro.
+            while (token != NULL)
+            {
+              datosLibro = TituloActual->value;
+
+              buscadorDePalabra = searchMap(datosLibro->mapaPalabras,token);
+              if(buscadorDePalabra != NULL){
+                contPalabras++;
+              }
+
+              printf("%d\n\n", contPalabras);
+
+              if(contPalabras == cantPalabrasIngresadas){
+                printf("%s\n", datosLibro->titulo);
+              }
+
+              token = strtok(NULL, limit);
+            }
+
+            TituloActual = nextTreeMap(LibrosPorTitulo);
+        }
+
+    } else printf("Por favor, introduzca una palabra la proxima vez.\n\n");
 
 }
+
 void palabrasMasRelevantes(Map* MapaLibros)
 {
     char nombre[100];
@@ -380,7 +418,7 @@ int main()
                     break;
             case 4: printf("FUNCION NO IMPLEMENTADA!\n");
                     break;
-            case 5: palabrasMasRelevantes(mapaLibrosPorID);
+            case 5: //palabrasMasRelevantes(mapaLibrosPorID);
                     break;
             case 6: getchar();
                     printf("Ingrese la palabra que desea buscar\n");
