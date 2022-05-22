@@ -283,7 +283,7 @@ void buscarLibroPorTitulo(TreeMap* LibrosPorTitulo, char* palabrasTitulo){
         return;
     }
 
-    if(palabrasTitulo == ""){ //Si no se introdujo ninguna palabra, se retorna al menú con un aviso al respecto.
+    if(palabrasTitulo[0] == '\n'){ //Si no se introdujo ninguna palabra, se retorna al menú con un aviso al respecto.
         printf("Por favor, introduzca una palabra la proxima vez.\n\n");
         return;
     }
@@ -300,7 +300,7 @@ void buscarLibroPorTitulo(TreeMap* LibrosPorTitulo, char* palabrasTitulo){
             contPalabras = 0;
             i=0;
 
-            while (listaPalabrasIng[i] != NULL)
+            for(i; i<cantPalabrasIngresadas;i++)
             {
               printf("%s ", listaPalabrasIng[i]);
               datosLibro = TituloActual->value;
@@ -311,14 +311,22 @@ void buscarLibroPorTitulo(TreeMap* LibrosPorTitulo, char* palabrasTitulo){
 
               printf("%d\n\n", contPalabras);
               i++;
+              printf("Palabra procesada\n");
             }
 
             if(contPalabras == cantPalabrasIngresadas){ //Si las palabras presentes coinciden con las ingresadas, se muestra el libro que las contiene.
+                printf("aumenta contador de titulos\n");
                 printf("%s\n", datosLibro->titulo);
                 contTitulos++;
             }
 
+            printf("Avanza al siguiente titulo\n");
             TituloActual = nextTreeMap(LibrosPorTitulo); //Una vez terminado con el libro, se avanza al siguiente.
+        }
+
+        if(contTitulos == 0) printf("Lo sentimos, pero ningun titulo posee todas las palabras.\n\n");
+        for(i=0;i<cantPalabrasIngresadas;i++){
+            free(listaPalabrasIng[i]);
         }
 
     }
