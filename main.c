@@ -286,7 +286,9 @@ void buscarLibroPorTitulo(TreeMap* LibrosPorTitulo, char* palabrasTitulo){
     if(palabrasTitulo[0] == '\n'){ //Si no se introdujo ninguna palabra, se retorna al menú con un aviso al respecto.
         printf("Por favor, introduzca una palabra la proxima vez.\n\n");
         return;
-    }
+    } //FUNCIÓN OMITIDA POR ALGUNA RAZÓN.
+
+    printf("\n");
 
     if (token != NULL) //Se procede con las palabras.
     {
@@ -298,29 +300,22 @@ void buscarLibroPorTitulo(TreeMap* LibrosPorTitulo, char* palabrasTitulo){
 
         while(TituloActual != NULL){ //Mientras hayan documentos, se van analizando uno tras uno.
             contPalabras = 0;
-            i=0;
+            datosLibro = TituloActual->value;
 
-            for(i; i<cantPalabrasIngresadas;i++)
+            for(i=0; i<cantPalabrasIngresadas;i+=1)
             {
-              printf("%s ", listaPalabrasIng[i]);
-              datosLibro = TituloActual->value;
 
               if(searchMap(datosLibro->mapaPalabras,listaPalabrasIng[i]) != NULL){ 
                 contPalabras++;
               } //Si está en el libro, aumenta la cantidad de palabras presentes.
 
-              printf("%d\n\n", contPalabras);
-              i++;
-              printf("Palabra procesada\n");
             }
 
             if(contPalabras == cantPalabrasIngresadas){ //Si las palabras presentes coinciden con las ingresadas, se muestra el libro que las contiene.
-                printf("aumenta contador de titulos\n");
                 printf("%s\n", datosLibro->titulo);
                 contTitulos++;
             }
 
-            printf("Avanza al siguiente titulo\n");
             TituloActual = nextTreeMap(LibrosPorTitulo); //Una vez terminado con el libro, se avanza al siguiente.
         }
 
