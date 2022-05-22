@@ -355,14 +355,44 @@ void buscarLibroPorTitulo(TreeMap* LibrosPorTitulo, char* palabrasTitulo){
 
 }
 
+int comparadorApariciones(const void* a, const void* b)
+{
+    tipoPalabra* palabraA = *(tipoPalabra**) a; //obtener elemento al que apunta el puntero
+    tipoPalabra* palabraB = *(tipoPalabra**) b;
+    if (palabraA->apariciones < palabraB->apariciones) return -1;
+    if (palabraA->apariciones == palabraB->apariciones) return 0;
+    if (palabraA->apariciones > palabraB->apariciones) return 1;
+}
+
 void palabrasMasFrecuentes(Map* mapaLibrosPorID)
 {
     char id[50];
     getchar();
     printf("Ingrese el id del libro ");
     scanf("%50[^\n]s", id);
-    tipoLibro* texto = searchMap(mapaLibrosPorID, id);
-
+    tipoLibro* libro = searchMap(mapaLibrosPorID, id);
+    if (libro == NULL) 
+    {
+        printf("Libro no encontrado");
+        return;
+    }
+    int sizeMapaPalabras = 0;
+    tipoPalabra* palabra = firstMap(libro->mapaPalabras);
+    while (palabra != NULL) //contar palabras del libro
+    {
+        //ya encontramos una palabra
+        sizeMapaPalabras++;
+        palabra = nextMap(libro->mapaPalabras);
+    }
+    tipoPalabra** arrayPalabras = (tipoPalabra**) malloc (sizeof(tipoPalabra*) * sizeMapaPalabras); //ocupar array para poder hacer qsort
+    palabra = firstMap(libro->mapaPalabras);
+    for (int i = 0; i < sizeMapaPalabras; i++)//copiar las palabras de MapaPalabras a arrayPalabras
+    {
+        arrayPalabras[i] = palabra;
+        palabra = nextMap(libro->mapaPalabras);
+    }
+    qsort(arrayPalabras, sizeMapaPalabras, sizeof(tipoPalabra*), comparadorApariciones); //ordenar el arreglo de palabras de menor a mayor
+    
 }
 
 void palabrasMasRelevantes(Map* MapaLibros)
