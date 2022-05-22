@@ -356,6 +356,16 @@ void buscarLibroPorTitulo(TreeMap* LibrosPorTitulo, char* palabrasTitulo){
 
 }
 
+void palabrasMasFrecuentes(Map* mapaLibrosPorID)
+{
+    char id[50];
+    getchar();
+    printf("Ingrese el id del libro ");
+    scanf("%50[^\n]s", id);
+    tipoLibro* texto = searchMap(mapaLibrosPorID, id);
+    
+}
+
 void palabrasMasRelevantes(Map* MapaLibros)
 {
     char nombre[100];
