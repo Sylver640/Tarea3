@@ -299,45 +299,46 @@ void mostrarDocsOrdenados(TreeMap* LibrosPorTitulo){
 
 void buscarLibroPorTitulo(TreeMap* LibrosPorTitulo, char* palabrasTitulo){
     Pair* TituloActual = firstTreeMap(LibrosPorTitulo); //Se comienza a analizar el primer documento.
-    char limit[2] = " ";
-    char* token = strtok(palabrasTitulo, limit);
-    int contPalabras = 0;
-    tipoLibro* datosLibro;
-    int cantPalabrasIngresadas = 0;
-    char* listaPalabrasIng[100];
-    int i;
-    int contTitulos=0;
+    char limit[2] = " "; //Variable que ayudará a separar cada palabra insertada.
+    char* token = strtok(palabrasTitulo, limit); //Comienza tomando la primera palabra insertada.
+    int contPalabras = 0; //Contador de palabras ingresadas presentes en un cierto documento.
+    int largoPalabra = strlen(token); 
+    tipoLibro* datosLibro; 
+    int cantPalabrasIngresadas = 0; 
+    char* listaPalabrasIng[100]; //Aquí se almacena una palabra por posición.
+    int i=0; //Para recorrer el arreglo listaPalabrasIng y convertir palabras en minuscula.
+    int contTitulos=0; //Titulos que poseen todas las palabras ingresadas.
     
     if(!TituloActual){ //Si no hay un primer documento, es porque no hay cargados en el programa.
         printf("No existen documentados cargados.\n\n");
         return;
     }
 
-    if(palabrasTitulo[0] == '\n'){ //Si no se introdujo ninguna palabra, se retorna al menú con un aviso al respecto.
-        printf("Por favor, introduzca una palabra la proxima vez.\n\n");
-        return;
-    } //FUNCIÓN OMITIDA POR ALGUNA RAZÓN.
-
     printf("\n");
 
     if (token != NULL) //Se procede con las palabras.
     {
         while(token != NULL){ //Se reconoce la cantidad de palabras ingresadas.
-            listaPalabrasIng[cantPalabrasIngresadas] = token;
-            token = strtok(NULL, limit);
-            cantPalabrasIngresadas++;
+            largoPalabra = strlen(token);
+            for(i=0;i<largoPalabra;i++){ //Conversión de palabra a minusculas estricto.
+                token[i]=tolower(token[i]);
+            }
+            listaPalabrasIng[cantPalabrasIngresadas] = token; //Se inserta la palabra en minusculas al arreglo.
+            token = strtok(NULL, limit); 
+            cantPalabrasIngresadas++; //Se lleva el conteo de las palabras ingresadas para una comparación más facil.
         }
 
         while(TituloActual != NULL){ //Mientras hayan documentos, se van analizando uno tras uno.
-            contPalabras = 0;
-            datosLibro = TituloActual->value;
+
+            contPalabras = 0; //Se reinicia el contador de palabras al pasar a un nuevo documento.
+            datosLibro = TituloActual->value; //Los datos del nuevo documento.
 
             for(i=0; i<cantPalabrasIngresadas;i+=1)
             {
 
               if(searchMap(datosLibro->mapaPalabras,listaPalabrasIng[i]) != NULL){ 
                 contPalabras++;
-              } //Si está en el libro, aumenta la cantidad de palabras presentes.
+              } //Si una palabra está en el libro, aumenta la cantidad de palabras presentes.
 
             }
 
@@ -350,9 +351,11 @@ void buscarLibroPorTitulo(TreeMap* LibrosPorTitulo, char* palabrasTitulo){
         }
 
         if(contTitulos == 0) printf("Lo sentimos, pero ningun titulo posee todas las palabras.\n\n");
+        //Si no hay titulos que contengan todas las palabras, se avisa al usuario.
+
         for(i=0;i<cantPalabrasIngresadas;i++){
             free(listaPalabrasIng[i]);
-        }
+        } //Se procede a eliminar todas las palabras insertadas para un nuevo uso de la función.
 
     }
 
