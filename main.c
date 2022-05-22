@@ -479,47 +479,43 @@ void palabrasMasRelevantes(Map* MapaLibros)
 
 void mostrarContexto(char* titulo, char* palabra, TreeMap* mapaLibrosPorTitulo)
 {
-    Pair* searchData = searchTreeMap(mapaLibrosPorTitulo, titulo);
+    Pair* searchData = searchTreeMap(mapaLibrosPorTitulo, titulo); //Se busca el libro
     if(searchData == NULL)
     {
         printf("No existe el texto que busca!\n"); 
         return;
     }
 
-    tipoLibro* textoCargado = searchData->value;
+    tipoLibro* textoCargado = searchData->value; //Al ser un árbol binario, se crea una nueva variable tipoLibro que almacenará el value del pair en el treeMap
     char path[1024];
-    snprintf(path, sizeof(path), "books/%s.txt", textoCargado->id);
-    FILE* f = fopen(path, "r");
+    snprintf(path, sizeof(path), "books/%s.txt", textoCargado->id); //Al igual que en la función cargar, creamos una variable path para abrir el archivo con más facilidad
+    FILE* f = fopen(path, "r"); //Se abre el archivo
 
-    tipoPalabra* word = searchMap(textoCargado->mapaPalabras, palabra);
+    tipoPalabra* word = searchMap(textoCargado->mapaPalabras, palabra); //Se busca la palabra indicada por el usuario
     if (word == NULL)
     {
         printf("La palabra indicada no esta en este texto\n");
         return;
     }
-    
-    char* contexto = (char*) malloc (sizeof(char));
-    contexto[0] = '\0';
+
+    //Inicialización de variables
     char* palabraAntes = (char*) malloc (sizeof(char));
-    long* posicion = (firstList(word->posicionPalabra));
+    long* posicion = (firstList(word->posicionPalabra)); //Ingresamos a la primera posición en la lista
     while (posicion != NULL)
     {
         printf("--");
-        word->palabra[0] = tolower(word->palabra[0]);
-        printf("%s ", word->palabra);
-        for (int i = 0; i < 100; i+=strlen(palabraAntes))
+        word->palabra[0] = toupper(word->palabra[0]); //Hacemos mayúscula la primera letra de la palabra para diferenciar entre oraciones
+        printf("%s ", word->palabra); //Se imprime la palabra en sí
+        for (int i = 0; i < 100; i+=strlen(palabraAntes)) //Dentro de este ciclo if, iremos palabra por palabra que vienen después de la indicada
         {
-            fseek(f, *posicion+i, SEEK_SET);
-            fscanf(f, "%1023s", palabraAntes);
-            //palabraAntes = quitarCaracteres(palabraAntes, """'/*¨{}[]<>|$%&_^°¬¿¡ÔÇ£ÔÇØ#&=~+’“”");
+            fseek(f, *posicion+i, SEEK_SET); //Se busca la posición de la siguiente palabra
+            fscanf(f, "%1023s", palabraAntes); //Se escribe en palabraAntes la palabra encontrada en la posición de fseek
             if (strlen(palabraAntes) > 1)
-            {
-                printf("%s ", palabraAntes);
-            }
+                printf("%s ", palabraAntes); //Si la palabra contiene más de un caracter, se imprime
         }
         printf("--");
         printf("\n\n");
-        posicion = nextList(word->posicionPalabra);
+        posicion = nextList(word->posicionPalabra); //Se avanza a la siguiente posición de la lista adjunta
     }
 }
 
