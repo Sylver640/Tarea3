@@ -384,6 +384,11 @@ void palabrasMasFrecuentes(Map* mapaLibrosPorID)
         sizeMapaPalabras++;
         palabra = nextMap(libro->mapaPalabras);
     }
+    if (sizeMapaPalabras == 0)
+    {
+        printf("Libro sin palabras");
+        return;
+    }
     tipoPalabra** arrayPalabras = (tipoPalabra**) malloc (sizeof(tipoPalabra*) * sizeMapaPalabras); //ocupar array para poder hacer qsort
     palabra = firstMap(libro->mapaPalabras);
     for (int i = 0; i < sizeMapaPalabras; i++)//copiar las palabras de MapaPalabras a arrayPalabras
