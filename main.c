@@ -9,22 +9,24 @@
 #include "treemap.h"
 #include "heap.h"
 
+//Struct que guarda los datos de los libros
 typedef struct
 {
     char id[50];
     char titulo[100];
     double cantPalabras;
     long cantCaracteres;
-    Map* mapaPalabras;
+    Map* mapaPalabras; //Mapa que guarda datos de tipoPalabra
 } tipoLibro;
 
+//Struct que guarda todo lo necesario para procesar palabras
 typedef struct
 {
     double apariciones;
     char palabra[100];
     double relevancia;
-    List* posicionPalabra;
-    List* libroAsociado; //Al final será útil esto??
+    List* posicionPalabra; //Lista que guarda las posiciones de la palabra en distintos puntos del texto
+    List* libroAsociado; //Lista que guarda los libros asociados a esta palabra
 } tipoPalabra;
 
 /*
@@ -63,6 +65,7 @@ int lower_than_int(void * key1, void * key2) {
     return 0;
 }
 
+//Función booleana que verifica si la palabra pertenece a la lista de las palabras más usadas en los textos de habla inglesa
 bool esComun (char* palabra)
 {
     char* commonWords[100] = {"the", "be", "to", "of", "and", "a", "in", "that", "have", "i", "it", "for", "not", "on", 
@@ -82,6 +85,8 @@ bool esComun (char* palabra)
     return false;
 }
 
+
+//Función que permite avanzar por el texto palabra por palabra
 char* next_word (FILE *f) {
     char x[1024];
     if (fscanf(f, " %1023s", x) == 1)
@@ -90,6 +95,7 @@ char* next_word (FILE *f) {
         return NULL;
 }
 
+//Función que detecta si es necesario eliminar un caracter de un string
 int hayQueEliminar (char c, char* string_chars)
 {
     for (int i = 0; i < strlen(string_chars); i++)
@@ -106,7 +112,7 @@ char* quitarCaracteres(char* string, char* c)
         {
             for (k = i; k < strlen(string)-1; k++)
                 string[k] = string[k+1];
-            string[k] = '\0';
+            string[k] = '\0'; //Se elimina la posición, siendo el nuevo fin del string
             i--;
         }
     }
@@ -114,84 +120,69 @@ char* quitarCaracteres(char* string, char* c)
     return string;
 }
 
-/*int obtenerPosicion (char* palabra, FILE* f)
-{
-    int posicion;
-    while (1)
-    {
-        int posAux =  ftell(f);
-        if (fscanf(f, "%1023s", palabra) == 1)
-        {
-            posicion = posAux;
-        } else break;
-    }
-    return posicion;
-    //pushBack(save->posicionPalabra, &posicion);
-}*/
-
 void contarPalabrasYCaracteres(FILE* texto, tipoLibro* nuevoLibro)
 {
     tipoPalabra* palabraAuxiliar = (tipoPalabra*) malloc (sizeof(tipoPalabra));
     char* palabra = (char*) malloc (100*sizeof(char));
-    palabra = next_word(texto);
+    palabra = next_word(texto); //Se empieza a buscar en la primera palabra del texto
     for (int i = 0; palabra[i]; i++)
-        palabra[i] = tolower(palabra[i]);
+        palabra[i] = tolower(palabra[i]); //se hace minúscula la palabra para un procesamiento más rápido
     int k = 0;
     int repetidas = 1;
-    while (palabra)
+    while (palabra) //Se entra a un ciclo while hasta que llegar al fin del texto
     {
         for (int i = 0; palabra[i]; i++)
             palabra[i] = tolower(palabra[i]);
-        palabra = quitarCaracteres(palabra, "!?,;""':.1234567890/()-*¨{}[]<>|$%&_^°¬¿¡ÔÇ£ÔÇØ#&=~+’“”");
+        palabra = quitarCaracteres(palabra, "!?,;""':.1234567890/()-*¨{}[]<>|$%&_^°¬¿¡ÔÇ£ÔÇØ#&=~+’“”"); //Se eliminan los caracteres señalados entre las comillas
 
-        nuevoLibro->cantPalabras++;
+        nuevoLibro->cantPalabras++; //Se aumenta la cantidad de palabras del libro en una unidad
         for (int i = 0; i < strlen(palabra); i++)
-            nuevoLibro->cantCaracteres++;
+            nuevoLibro->cantCaracteres++; //Por cada carácter de cada palabra, se aumenta en una unidad la cantidad de caracteres del libro
         
-        if (!esComun(palabra) && palabra[0] != '\0')
+        if (!esComun(palabra) && palabra[0] != '\0') //Se entra al if si la palabra no está en la lista de palabras comunes y no es una palabra vacía, es decir, que comienze con un espacio
         {
-            //int posicion = obtenerPosicion(palabra, texto);
-            //printf("busca la posicion\n");
-            if (searchMap(nuevoLibro->mapaPalabras, palabra) == NULL)
+            if (searchMap(nuevoLibro->mapaPalabras, palabra) == NULL) //pasa por aquí si no se encuentra la palabra en el mapa
             {
-                tipoPalabra* nuevaPalabra = (tipoPalabra*) malloc (sizeof(tipoPalabra));
-                nuevaPalabra->posicionPalabra = createList();
+                tipoPalabra* nuevaPalabra = (tipoPalabra*) malloc (sizeof(tipoPalabra)); //Nueva variable que sirve para guardar los datos de la nueva palabra
+                nuevaPalabra->posicionPalabra = createList(); //Se crea la lista de posiciones
                 long *posicion = malloc(sizeof(long));
-                *posicion = ftell(texto);
-                pushBack(nuevaPalabra->posicionPalabra, posicion);
+                *posicion = ftell(texto); //corresponde a la posición de la palabra en el texto, que es un valor entero
+                pushBack(nuevaPalabra->posicionPalabra, posicion); //se agrega la posición a la lista
+                //se agrega la posición a la lista
                 nuevaPalabra->apariciones = 1;
                 strcpy(nuevaPalabra->palabra, palabra);
                 nuevaPalabra->relevancia = 0;
-                insertMap(nuevoLibro->mapaPalabras, palabra, nuevaPalabra);
+                insertMap(nuevoLibro->mapaPalabras, palabra, nuevaPalabra); //Se inserta la nueva palabra en el mapa
             }
 
-            if (searchMap(nuevoLibro->mapaPalabras, palabra) != NULL)
+            if (searchMap(nuevoLibro->mapaPalabras, palabra) != NULL) //si no, se pasa por aquí
             {
-                palabraAuxiliar = searchMap(nuevoLibro->mapaPalabras, palabra);
+                palabraAuxiliar = searchMap(nuevoLibro->mapaPalabras, palabra); //Variable auxiliar para ingresar al dato especificado
                 palabraAuxiliar->apariciones++;
                 long *posicion = malloc(sizeof(long));
                 *posicion = ftell(texto);
                 pushBack(palabraAuxiliar->posicionPalabra, posicion);
             }
         }
-        palabra = next_word(texto);
+        palabra = next_word(texto); //Se avanza a la siguiente palabra
     }
 }
 
 void cargarDocumentos (char* idLibros, Map* mapaLibrosPorID, TreeMap* mapaLibrosPorTitulo)
 {
-    char limit[2] = " ";
+    char limit[2] = " "; //Se define el límite para ir palabra por palabra
     char path[100];
     char linea[1024];
     char* titulo = (char*) malloc (100*sizeof(char));
-    char* token = strtok(idLibros, limit);
+    char* token = strtok(idLibros, limit); //Con el uso de la función strtok, avanzamos por las palabras separadas por espacio
     if (token != NULL)
     {
-        while (token != NULL)
+        while (token != NULL) //el while sigue hasta que no hayan más palabras en el string original
         {
-            snprintf(path, sizeof(path), "books/%s.txt", token);
-            FILE* texto = fopen(path, "rt");
-            if (texto == NULL) 
+            snprintf(path, sizeof(path), "books/%s.txt", token); //Esta función nos ayuda a definir una variable para abrir el texto con más facilidad,
+                                                                 //en donde se inserta la variable en un string. En este caso, para ingresar directamente a una carpeta
+            FILE* texto = fopen(path, "rt"); //Así, se abre el archivo con la dirección (path) del archivo
+            if (texto == NULL) //Si el texto no se encuentra, se le avisa al usuario y se avanza al siguiente token
             {
                 printf("Texto %s no encontrado!\n", path);
                 token = strtok(NULL, limit);
@@ -202,26 +193,29 @@ void cargarDocumentos (char* idLibros, Map* mapaLibrosPorID, TreeMap* mapaLibros
             
             tipoLibro* nuevoTexto = (tipoLibro*) malloc (sizeof(tipoLibro));
             strcpy(nuevoTexto->id, token);
-            fgets(linea, 1023, texto);
             
+            fgets(linea, 1023, texto); //Se entra a la primera línea del texto
             titulo[0] = '\0';
-            const char *start = strchr(linea, 'f') + 2;
-            strncat(titulo, start, strcspn(start, "\n"));
-            titulo = quitarCaracteres(titulo, ";""'/()-*¨{}[]<>|$%&_^°¬¿¡ÔÇ£ÔÇØ#&=~+’“”");
-            strcpy(nuevoTexto->titulo, titulo);
+            const char *start = strchr(linea, 'f') + 2; //Se define el inicio para copiar el string
+            strncat(titulo, start, strcspn(start, "\n")); //Se copia la variable de start dentro del titulo
+            titulo = quitarCaracteres(titulo, ";""'/()-*¨{}[]<>|$%_^°¬¿¡ÔÇ£ÔÇØ#&=~+’“”"); //Se eliminan del titulo todos los caracteres que "estorben"
+            strcpy(nuevoTexto->titulo, titulo); //Finalmente se copia el titulo dentro del nuevo libro
+
+            //Se inician las variables restantes
             nuevoTexto->cantCaracteres = 0;
             nuevoTexto->cantPalabras = 0;
             nuevoTexto->mapaPalabras = createMap(is_equal_string);
             contarPalabrasYCaracteres(texto, nuevoTexto);
 
-            insertMap(mapaLibrosPorID, nuevoTexto->id, nuevoTexto);
-            insertTreeMap(mapaLibrosPorTitulo, nuevoTexto->titulo, nuevoTexto);
+            insertMap(mapaLibrosPorID, nuevoTexto->id, nuevoTexto); //Se inserta al mapa cuya key es la ID
+            insertTreeMap(mapaLibrosPorTitulo, nuevoTexto->titulo, nuevoTexto); //Se inserta al árbol cuya key es el título del libro
 
-            fclose(texto);
-            token = strtok(NULL, limit);
+            fclose(texto); //Se cierra el archivo
+            token = strtok(NULL, limit); //Se avanza al siguiente token
         }
     }
 }
+
 double calcularRelevancia(tipoLibro *elLibro, double cont_apariciones, double total_libros,tipoPalabra * buscador)
 {
     double a,b;
@@ -292,7 +286,7 @@ void mostrarDocsOrdenados(TreeMap* LibrosPorTitulo){
     //De lo contrario, se procede a mostrar los datos de todos los documentos en orden alfabético por título.
     while(IDActual != NULL){
         libroAuxiliar = IDActual->value;
-        printf("ID: %s\nTitulo: %s\nCantidad de palabras: %ld\nCantidad de caracteres: %ld\n\n", libroAuxiliar->id, libroAuxiliar->titulo, libroAuxiliar->cantPalabras, libroAuxiliar->cantCaracteres);
+        printf("ID: %s\nTitulo: %s\nCantidad de palabras: %.0lf\nCantidad de caracteres: %ld\n\n", libroAuxiliar->id, libroAuxiliar->titulo, libroAuxiliar->cantPalabras, libroAuxiliar->cantCaracteres);
         IDActual = nextTreeMap(LibrosPorTitulo);
     } 
 
@@ -472,6 +466,7 @@ void mostrarContexto(char* titulo, char* palabra, TreeMap* mapaLibrosPorTitulo)
 
 int main()
 {
+    //Inicialización de variables
     Map* mapaLibrosPorID = createMap(is_equal_string);
     TreeMap* mapaLibrosPorTitulo = createTreeMap(lower_than_string);
     char* idLibros = (char*) malloc (50*sizeof(char));
