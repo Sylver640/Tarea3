@@ -274,7 +274,9 @@ void buscarLibroPorTitulo(TreeMap* LibrosPorTitulo, char* palabrasTitulo){
     int contPalabras = 0;
     tipoLibro* datosLibro;
     int cantPalabrasIngresadas = 0;
-    tipoPalabra* buscadorDePalabra;
+    char* listaPalabrasIng[100];
+    int i;
+    int contTitulos=0;
     
     if(!TituloActual){ //Si no hay un primer documento, es porque no hay cargados en el programa.
         printf("No existen documentados cargados.\n\n");
@@ -289,30 +291,31 @@ void buscarLibroPorTitulo(TreeMap* LibrosPorTitulo, char* palabrasTitulo){
     if (token != NULL) //Se procede con las palabras.
     {
         while(token != NULL){ //Se reconoce la cantidad de palabras ingresadas.
-            cantPalabrasIngresadas++;
+            listaPalabrasIng[cantPalabrasIngresadas] = token;
             token = strtok(NULL, limit);
+            cantPalabrasIngresadas++;
         }
 
         while(TituloActual != NULL){ //Mientras hayan documentos, se van analizando uno tras uno.
             contPalabras = 0;
-            token = strtok(palabrasTitulo, limit); //Se regresa a la primera palabra tras cada libro.
+            i=0;
 
-            while (token != NULL)
+            while (listaPalabrasIng[i] != NULL)
             {
-              printf("%s ", token);
+              printf("%s ", listaPalabrasIng[i]);
               datosLibro = TituloActual->value;
 
-              buscadorDePalabra = searchMap(datosLibro->mapaPalabras,token); //Se busca la palabra dentro del libro.
-              if(buscadorDePalabra != NULL){ 
+              if(searchMap(datosLibro->mapaPalabras,listaPalabrasIng[i]) != NULL){ 
                 contPalabras++;
               } //Si está en el libro, aumenta la cantidad de palabras presentes.
 
               printf("%d\n\n", contPalabras);
-              token = strtok(NULL, limit); //Se pasa a la siguiente palabra.
+              i++;
             }
 
             if(contPalabras == cantPalabrasIngresadas){ //Si las palabras presentes coinciden con las ingresadas, se muestra el libro que las contiene.
                 printf("%s\n", datosLibro->titulo);
+                contTitulos++;
             }
 
             TituloActual = nextTreeMap(LibrosPorTitulo); //Una vez terminado con el libro, se avanza al siguiente.
@@ -462,7 +465,7 @@ int main()
             case 2: mostrarDocsOrdenados(mapaLibrosPorTitulo);
                     break;
             case 3: getchar();
-                    printf("Ingrese palabras separadas por espacios, el algoritmo buscar titulos que las contengan: \n");
+                    printf("Ingrese palabras separadas por espacios, el algoritmo buscara titulos que las contengan: \n");
                     scanf("%100[^\n]s", titulo);
                     getchar();
                     buscarLibroPorTitulo(mapaLibrosPorTitulo, titulo);
