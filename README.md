@@ -10,7 +10,7 @@ Integrantes : Rodrigo Araos.
 1. Abrir una terminal de perfil "Microsoft Powershell".
 
 2. Una vez cargada la terminal escribir el siguiente código:
-gcc -g main.c list.c Map.c treemap.c -o Tarea3, y luego enter. Esto ayudará a compilar el programa.
+gcc -g main.c list.c Map.c treemap.c heap.c -o Tarea3, y luego enter. Esto ayudará a compilar el programa.
 
 3. Una vez terminada la compilación, escribir "./Tarea3" sin las comillas y luego enter, lo
 cual efectuará la ejecución del programa
