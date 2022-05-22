@@ -154,8 +154,7 @@ void contarPalabrasYCaracteres(FILE* texto, tipoLibro* nuevoLibro)
                 nuevaPalabra->relevancia = 0;
                 insertMap(nuevoLibro->mapaPalabras, palabra, nuevaPalabra); //Se inserta la nueva palabra en el mapa
             }
-
-            if (searchMap(nuevoLibro->mapaPalabras, palabra) != NULL) //si no, se pasa por aquí
+            else //si no, se pasa por aquí
             {
                 palabraAuxiliar = searchMap(nuevoLibro->mapaPalabras, palabra); //Variable auxiliar para ingresar al dato especificado
                 palabraAuxiliar->apariciones++;
@@ -363,7 +362,7 @@ void palabrasMasFrecuentes(Map* mapaLibrosPorID)
     printf("Ingrese el id del libro ");
     scanf("%50[^\n]s", id);
     tipoLibro* texto = searchMap(mapaLibrosPorID, id);
-    
+
 }
 
 void palabrasMasRelevantes(Map* MapaLibros)
