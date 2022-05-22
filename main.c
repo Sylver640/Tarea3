@@ -481,39 +481,40 @@ void mostrarContexto(char* titulo, char* palabra, TreeMap* mapaLibrosPorTitulo)
     }
 
     tipoLibro* textoCargado = searchData->value;
+    char path[1024];
+    snprintf(path, sizeof(path), "books/%s.txt", textoCargado->id);
+    FILE* f = fopen(path, "r");
 
-    char* word;
-    if (searchMap(textoCargado->mapaPalabras, palabra) == NULL)
+    tipoPalabra* word = searchMap(textoCargado->mapaPalabras, palabra);
+    if (word == NULL)
     {
         printf("La palabra indicada no esta en este texto\n");
         return;
     }
-    /*
-    el procedimiento para el contexto debe ser:
-    1. ir a la posicion guardada en el mapa
-    2. en la variable contexto, pegar las 5 palabras que vienen antes
-    3. pegar luego la palabra en sí
-    4. pegar las 5 palabras que vienen después
-    5. agregar el string a la lista de frases
-    */
-    //contexto[0] = '\0';
-    /*for (int i = 5; i > 0; i--)
+    
+    char* contexto = (char*) malloc (sizeof(char));
+    contexto[0] = '\0';
+    char* palabraAntes = (char*) malloc (sizeof(char));
+    long* posicion = (firstList(word->posicionPalabra));
+    while (posicion != NULL)
     {
-        fseek(texto, (pos-i), SEEK_SET);
-        fscanf(texto, " %1023s", contextWord);
-        printf("palabra contextual %i posiciones antes: %s\n", i, contextWord);
-        strcat(contexto, contextWord);
+        printf("--");
+        word->palabra[0] = tolower(word->palabra[0]);
+        printf("%s ", word->palabra);
+        for (int i = 0; i < 100; i+=strlen(palabraAntes))
+        {
+            fseek(f, *posicion+i, SEEK_SET);
+            fscanf(f, "%1023s", palabraAntes);
+            //palabraAntes = quitarCaracteres(palabraAntes, """'/*¨{}[]<>|$%&_^°¬¿¡ÔÇ£ÔÇØ#&=~+’“”");
+            if (strlen(palabraAntes) > 1)
+            {
+                printf("%s ", palabraAntes);
+            }
+        }
+        printf("--");
+        printf("\n\n");
+        posicion = nextList(word->posicionPalabra);
     }
-    strcat(contexto, palabra);
-    for (int i = 0; i < 6; i++)
-    {
-        fseek(texto, (pos+i), SEEK_SET);
-        fscanf(texto, " %1023s", contextWord);
-        printf("palabra contextual %i posiciones despues: %s\n", i, contextWord);
-        strcat(contexto, contextWord);
-    }*/
-    //contexto = quitarCaracteres(contexto, """'/*¨{}[]<>|$%&_^°¬¿¡ÔÇ£ÔÇØ#&=~+’“”");
-    //printf("contexto de %s: %s\n", palabra, contexto);
 }
 
 int main()
