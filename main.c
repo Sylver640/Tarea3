@@ -217,20 +217,23 @@ void cargarDocumentos (char* idLibros, Map* mapaLibrosPorID, TreeMap* mapaLibros
 
 double calcularRelevancia(tipoLibro *elLibro, double cont_apariciones, double total_libros,tipoPalabra * buscador)
 {
-    double a,b;
-    a= buscador->apariciones/elLibro->cantPalabras ;
+    double a,b; 
+    a= buscador->apariciones/elLibro->cantPalabras ; /* se divide la cantidad de apariciones de la palabra en el libro
+                                                        por la cantidad total de palabras del libro*/
     
-    b= logf(total_libros/cont_apariciones);
-    double relevancia = a* b ;
+    b= logf(total_libros/cont_apariciones); /* se divide todos los libros cargador por la cantidad de libros en que
+                                                aparece la palabra buscada*/
+    double relevancia = a* b ; 
     return relevancia;
 }
 
 void BuscarPorPalabra(char* palabra, Map* MapaLibros, List* listaPrioridad)
 {
-    tipoLibro* libro = firstMap(MapaLibros);
-    Mheap* monticuloRelevancia = createMheap();
+    tipoLibro* libro = firstMap(MapaLibros);  //Ingreso al primer libro del mapa 
+    Mheap* monticuloRelevancia = createMheap(); //Se utiliza para ordenar los libros segun la relevancia de la palabra ingresada
     double cont_apariciones = 0;
     double total_libros = 0;
+    //En el while se cuentan todos los libros y los libros en los que aparece la palabra
     while(libro != NULL)
     {
         tipoPalabra* buscador_palabra = searchMap(libro->mapaPalabras, palabra);
@@ -241,16 +244,17 @@ void BuscarPorPalabra(char* palabra, Map* MapaLibros, List* listaPrioridad)
         total_libros++;
         libro = nextMap(MapaLibros);
     }
-    libro = firstMap(MapaLibros);
+    libro = firstMap(MapaLibros); //vuelvo al primero de todos los libros
     while(libro != NULL)
     {
-        tipoPalabra* buscador_palabra = searchMap(libro->mapaPalabras, palabra);
+        tipoPalabra* buscador_palabra = searchMap(libro->mapaPalabras, palabra); //busco la palabra en el libro
         if(buscador_palabra != NULL )
         {
+            //si la palabra está, le calculo la relevancia y se agrega al Heap
             buscador_palabra->relevancia = calcularRelevancia(libro, cont_apariciones, total_libros, buscador_palabra);
             heap_push(monticuloRelevancia, libro, buscador_palabra->relevancia );
         }
-        libro = nextMap(MapaLibros);
+        libro = nextMap(MapaLibros); //Se mueve al siguiente libro
     }
     if(cont_apariciones == 0)
     {
@@ -261,12 +265,11 @@ void BuscarPorPalabra(char* palabra, Map* MapaLibros, List* listaPrioridad)
     tipoLibro* elLibro;
     while (monticuloRelevancia != NULL) 
         {
-            elLibro = heap_top(monticuloRelevancia);
+            elLibro = heap_top(monticuloRelevancia); //Ingreso al top del monticulo
             if(elLibro == NULL) break;
-            heap_pop(monticuloRelevancia);
-            printf(" Nombre del libro: %s\nID del libro: %s\n", elLibro->titulo, elLibro->id) ;
-            buscador = searchMap(elLibro->mapaPalabras, palabra)  ;
-            //double relevancia = calcularRelevancia(elLibro, cont_apariciones, total_libros, buscador);
+            heap_pop(monticuloRelevancia); //Elimino el top y se reordena el monticulo
+            printf("Nombre del libro: %s\nID del libro: %s\n", elLibro->titulo, elLibro->id) ;
+            buscador = searchMap(elLibro->mapaPalabras, palabra);//Busca la palabra en el libro
             printf("Relevancia de la palabra: %lf\n", buscador->relevancia);     
         }  
         return;         
@@ -414,8 +417,9 @@ void palabrasMasRelevantes(Map* MapaLibros)
     getchar();
     printf("Ingrese el nombre del libro ");
     scanf("%100[^\n]s", nombre);
-    tipoLibro* libro = firstMap(MapaLibros);
-    tipoLibro* libroBuscado = NULL ;
+    tipoLibro* libro = firstMap(MapaLibros); //ingresa al primer libro de los cargados
+    tipoLibro* libroBuscado = NULL ; 
+    //El while busca el libro ingresado por el usuario
     while(libro != NULL)
     {
         if(strcmp(libro->titulo, nombre) == 0)
@@ -426,22 +430,27 @@ void palabrasMasRelevantes(Map* MapaLibros)
         libro = nextMap(MapaLibros);
     }
     libro = firstMap(MapaLibros);
-    if(libroBuscado == NULL) return;
-    Mheap* monticuloRelevancia = createMheap();
+    if(libroBuscado == NULL) 
+    {
+        printf("El libro ingresado no se encuentra en nuestro catálogo");
+        return;
+    }
+    Mheap* monticuloRelevancia = createMheap(); //El heap guarda las palabras del libro buscado según su relevancia
     double totalLibros = 0;
     double aparicionEnLibros = 0;
+    //Se calcula el total de los libros
      while(libro != NULL)
     {
         totalLibros++;
         libro = nextMap(MapaLibros);
     }
     
-    tipoPalabra* buscador_palabra = firstMap(libroBuscado->mapaPalabras);
+    tipoPalabra* buscador_palabra = firstMap(libroBuscado->mapaPalabras); //Se ingresa a la primera palabra del libro buscado
     while(buscador_palabra != NULL)
     {
         aparicionEnLibros = 0;
         libro = firstMap(MapaLibros);
-        while(libro != NULL)
+        while(libro != NULL) //Se calcula la cantidad de veces que aparece la palabra en los libros
         {
             if(searchMap(libro->mapaPalabras, buscador_palabra->palabra) != NULL) 
             {
@@ -449,25 +458,22 @@ void palabrasMasRelevantes(Map* MapaLibros)
             }
             libro = nextMap(MapaLibros);
         }
-        if(buscador_palabra->relevancia == 0)
+        if(buscador_palabra->relevancia == 0) //Se calcula la relevancia
         {
             double a;
             a= buscador_palabra->apariciones/libroBuscado->cantPalabras;
-            //printf("la a es %lf ", a);
             double b;
             b= logf(totalLibros/aparicionEnLibros);
-            //printf("la b es %lf\n",b);
-            //printf("aparece %lf veces \n", aparicionEnLibros);
             buscador_palabra->relevancia =a * b;
         } 
-        heap_push(monticuloRelevancia, buscador_palabra, buscador_palabra->relevancia );
+        heap_push(monticuloRelevancia, buscador_palabra, buscador_palabra->relevancia );//Se agrega al montículo la palabra con su relevancia
         buscador_palabra = nextMap(libroBuscado->mapaPalabras);
     }  
-    for(int i = 0; i < 10; i++) 
+    for(int i = 0; i < 10; i++)  //Imprime las 10 palabras más relevantes del libro
         {
-            tipoPalabra* palabra = heap_top(monticuloRelevancia);
-            heap_pop(monticuloRelevancia);
-            printf("%s: %lf\n", palabra->palabra, palabra->relevancia);
+            tipoPalabra* palabra = heap_top(monticuloRelevancia); //Se ingresa al top del monticulo
+            heap_pop(monticuloRelevancia); //Se elimina el top y se reordena el monticulo
+            printf("%s: %lf\n", palabra->palabra, palabra->relevancia); //Se imprime la palabra
         }
 }
 
