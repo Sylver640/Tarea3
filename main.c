@@ -13,16 +13,16 @@ typedef struct
 {
     char id[50];
     char titulo[100];
-    long cantPalabras;
+    double cantPalabras;
     long cantCaracteres;
     Map* mapaPalabras;
 } tipoLibro;
 
 typedef struct
 {
-    int apariciones;
+    double apariciones;
     char palabra[100];
-    float relevancia;
+    double relevancia;
     List* posicionPalabra;
     List* libroAsociado; //Al final será útil esto??
 } tipoPalabra;
@@ -339,9 +339,8 @@ void palabrasMasRelevantes(Map* MapaLibros)
     getchar();
     printf("Ingrese el nombre del libro ");
     scanf("%100[^\n]s", nombre);
-    //if(searchMap(MapaLibros, nombre) == NULL) return;
     tipoLibro* libro = firstMap(MapaLibros);
-    tipoLibro* libroBuscado ;
+    tipoLibro* libroBuscado = NULL ;
     while(libro != NULL)
     {
         if(strcmp(libro->titulo, nombre) == 0)
@@ -353,7 +352,7 @@ void palabrasMasRelevantes(Map* MapaLibros)
     }
     libro = firstMap(MapaLibros);
     if(libroBuscado == NULL) return;
-    Heap* monticuloRelevancia;
+    Heap* monticuloRelevancia = createHeap();
     double totalLibros = 0;
     double aparicionEnLibros = 0;
      while(libro != NULL)
@@ -361,13 +360,15 @@ void palabrasMasRelevantes(Map* MapaLibros)
         totalLibros++;
         libro = nextMap(MapaLibros);
     }
+    
     tipoPalabra* buscador_palabra = firstMap(libroBuscado->mapaPalabras);
     while(buscador_palabra != NULL)
     {
+        aparicionEnLibros = 0;
         libro = firstMap(MapaLibros);
         while(libro != NULL)
         {
-            if(searchMap(libro->mapaPalabras, buscador_palabra) != NULL) 
+            if(searchMap(libro->mapaPalabras, buscador_palabra->palabra) != NULL) 
             {
                 aparicionEnLibros++;
             }
@@ -375,19 +376,29 @@ void palabrasMasRelevantes(Map* MapaLibros)
         }
         if(buscador_palabra->relevancia == 0)
         {
-            buscador_palabra->relevancia = ((buscador_palabra->apariciones) / (libro->cantPalabras)) * (log(totalLibros/aparicionEnLibros));
+            double a;
+            a= buscador_palabra->apariciones/libroBuscado->cantPalabras;
+            //printf("la a es %lf ", a);
+            double b;
+            b= logf(totalLibros/aparicionEnLibros);
+            //printf("la b es %lf\n",b);
+            //printf("aparece %lf veces \n", aparicionEnLibros);
+            buscador_palabra->relevancia =a * b;
+        } 
+        if(buscador_palabra->relevancia > 0)
+        {
+            printf("%s -> %lf \n", buscador_palabra->palabra, buscador_palabra->relevancia);
         }
+        
         heap_push(monticuloRelevancia, buscador_palabra, buscador_palabra->relevancia );
         buscador_palabra = nextMap(libroBuscado->mapaPalabras);
     }  
-
     for(int i = 0; i < 10; i++) 
         {
             tipoPalabra* palabra = heap_top(monticuloRelevancia);
             heap_pop(monticuloRelevancia);
             printf("%s: %lf\n", palabra->palabra, palabra->relevancia);
         }
-
 }
 
 void mostrarContexto(char* titulo, char* palabra, TreeMap* mapaLibrosPorTitulo)
