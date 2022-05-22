@@ -555,7 +555,7 @@ int main()
                     getchar();
                     buscarLibroPorTitulo(mapaLibrosPorTitulo, titulo);
                     break;
-            case 4: printf("FUNCION NO IMPLEMENTADA!\n");
+            case 4: palabrasMasFrecuentes(mapaLibrosPorID);
                     break;
             case 5: palabrasMasRelevantes(mapaLibrosPorID);
                     break;
