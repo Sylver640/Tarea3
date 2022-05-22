@@ -392,7 +392,15 @@ void palabrasMasFrecuentes(Map* mapaLibrosPorID)
         palabra = nextMap(libro->mapaPalabras);
     }
     qsort(arrayPalabras, sizeMapaPalabras, sizeof(tipoPalabra*), comparadorApariciones); //ordenar el arreglo de palabras de menor a mayor
-    
+    int contadorPalabras = 0;
+    for(int i = sizeMapaPalabras-1; i >= 0; i--) //va retrocediendo desde la última posición hasta el comienzo del arreglo
+    {
+        double frecuencia = arrayPalabras[i]->apariciones/libro->cantPalabras; //cálculo de frecuencia
+        printf("La palabra %s tiene una frecuencia de %f\n", arrayPalabras[i]->palabra, frecuencia);
+        contadorPalabras++;
+        if (contadorPalabras == 10) break; //solo necesitamos las 10 palabras más frecuentes, si es que el arreglo contiene más de 10 palabras
+    }
+    free(arrayPalabras);
 }
 
 void palabrasMasRelevantes(Map* MapaLibros)
