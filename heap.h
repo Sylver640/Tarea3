@@ -1,13 +1,13 @@
-#ifndef Heap_h
-#define Heap_h
+#ifndef HEAP_h
+#define HEAP_h
 
-typedef struct Heap Heap;
+typedef struct heap Mheap;
 
-Heap* createHeap();
-void* heap_top(Heap* pq);
-void heap_push(Heap* pq, void* data, int priority);
-void heap_pop(Heap* pq);
+Mheap* createMheap();
+void swap (Mheap* pq, int pos);
+void* heap_top(Mheap* pq);
+void heap_push(Mheap* pq, void* data, double priority);
+void heap_pop(Mheap* pq);
 
 
 #endif /* HashMap_h */
-

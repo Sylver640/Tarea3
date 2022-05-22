@@ -7,97 +7,92 @@
 
 typedef struct nodo{
    void* data;
-   int priority;
+   double priority;
 }heapElem;
 
-typedef struct Heap{
+struct heap{
   heapElem* heapArray;
   int size;
   int capac;
-} Heap;
+};
 
 
-void* heap_top(Heap* pq){
-   if(pq->size == 0) return NULL;
-   return (void*)pq->heapArray[0].data;
-}
-
-
-
-void heap_push(Heap* pq, void* data, int priority){
-  if(pq->size == pq->capac){
-      pq->capac = (pq->capac*2)+1;
-      pq->heapArray = (heapElem*)realloc(pq->heapArray,sizeof(heapElem)*pq->capac);
-   }
-
-   pq->heapArray[pq->size].data = data;
-   pq->heapArray[pq->size].priority = priority;
-
-   int posInf = pq->size;
-   int posSup = (pq->size - 1)/2;
-
-   heapElem* elemAux = (heapElem*)malloc(sizeof(heapElem));
-
-   while(posInf > 0){
-      if(pq->heapArray[posInf].priority > pq->heapArray[posSup].priority){
-         *elemAux = pq->heapArray[posSup];
-         pq->heapArray[posSup] = pq->heapArray[posInf];
-         pq->heapArray[posInf] = *elemAux;
-      }
-
-      posInf = posSup;
-      posSup = (posInf - 1)/2;
-   }
-
-   pq->size++;
-}
-
-
-void heap_pop(Heap* pq){
-   heapElem* elemAux = (heapElem*)malloc(sizeof(heapElem));
-
-   pq->heapArray[0] = pq->heapArray[pq->size-1];
-   pq->heapArray[pq->size-1].priority = 0;
-   pq->size--;
-
-   int posSup = 0;
-   int posInfIzq = (2*posSup)+1;
-   int posInfDer = (2*posSup)+2; 
-
-   while(posSup < pq->size){
-      if(pq->heapArray[posSup].priority <= pq->heapArray[posInfIzq].priority && pq->heapArray[posInfIzq].priority > pq->heapArray[posInfDer].priority){
-         *elemAux = pq->heapArray[posSup];
-         pq->heapArray[posSup] = pq->heapArray[posInfIzq];
-         pq->heapArray[posInfIzq] = *elemAux;
-
-         posSup = posInfIzq;
-         posInfIzq = (2*posSup)+1;
-         posInfDer = (2*posSup)+2; 
-         continue;
-
-      }else if(pq->heapArray[posSup].priority <= pq->heapArray[posInfDer].priority){
-         *elemAux = pq->heapArray[posSup];
-         pq->heapArray[posSup] = pq->heapArray[posInfDer];
-         pq->heapArray[posInfDer] = *elemAux;
-
-         posSup = posInfDer;
-         posInfIzq = (2*posSup)+1;
-         posInfDer = (2*posSup)+2; 
-         continue;
-      } else break;
-
-
-   }
+void* heap_top(Mheap* pq)
+{
+   if (pq == NULL || pq->heapArray == NULL) return NULL;
    
+   if (pq->size != 0)
+   {
+      return pq->heapArray[0].data;
+   }
+   return NULL;
 }
 
-Heap* createHeap(){
-   Heap* aux = (Heap*)malloc(sizeof(Heap));
-   aux->capac=3;
-   aux->size=0;
-   
-   aux->heapArray= (heapElem*)malloc(3*sizeof(heapElem));
+void swap (Mheap* pq, int pos)
+{
+  heapElem aux;
+  while (pos >= 0)
+  {
+    if (pq->heapArray[pos].priority > pq->heapArray[(pos-1)/2].priority)
+    {
+      aux = pq->heapArray[(pos-1)/2];
+      pq->heapArray[(pos-1)/2] = pq->heapArray[pos]; 
+      pq->heapArray[pos] = aux;
+      pos = (pos-1)/2;
+    }
+    else
+    {
+      return;
+    }
+  } 
+}
 
+void heap_push(Mheap* pq, void* data, double priority)
+{
+  if (pq->capac == pq->size)
+  {
+    pq->capac = (pq->capac * 2) + 1;
+    pq->heapArray = (heapElem*) realloc (pq->heapArray, (pq->capac)*sizeof(heapElem));
+  }
 
-   return aux;
+  int pos = pq->size;
+  pq->heapArray[pos].data = data;
+  pq->heapArray[pos].priority = priority;
+  swap(pq, pos);
+  pq->size = pq->size + 1;
+}
+
+void heap_pop(Mheap* pq)
+{
+  pq->size = pq->size - 1; 
+  pq->heapArray[0] = pq->heapArray[pq->size];
+  int pos = 0;
+  heapElem aux; 
+
+  while ((2*pos)+ 2 <= pq->size && (pq->heapArray[(2*pos)+1].priority > pq->heapArray[pos].priority || pq->heapArray[pos].priority < pq->heapArray[(2*pos)+2].priority))
+  {
+    if (pq->heapArray[(2*pos)+1].priority > pq->heapArray[(2*pos)+2].priority)
+    {
+      aux =  pq->heapArray[(2*pos)+1];
+      pq->heapArray[(2*pos)+1] = pq->heapArray[pos]; 
+      pq->heapArray[pos] = aux;
+      pos = (2*pos)+1;
+    }
+    else
+    {
+      aux = pq->heapArray[(2*pos)+2];
+      pq->heapArray[(2*pos)+2] = pq->heapArray[pos]; 
+      pq->heapArray[pos] = aux;
+      pos = (2*pos)+2;          
+    }
+  }
+}
+
+Mheap* createMheap()
+{
+   Mheap* pq = (Mheap*) calloc (1, sizeof(Mheap));
+   pq->capac = 3;//Capacidad del HEAP
+   pq->size = 0;// Total de elementos en el HEAP
+   pq->heapArray = (heapElem*) calloc (pq->capac, sizeof(heapElem));
+   return pq;
 }
