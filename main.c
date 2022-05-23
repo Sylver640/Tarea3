@@ -26,7 +26,6 @@ typedef struct
     char palabra[100];
     double relevancia;
     List* posicionPalabra; //Lista que guarda las posiciones de la palabra en distintos puntos del texto
-    List* libroAsociado; //Lista que guarda los libros asociados a esta palabra
 } tipoPalabra;
 
 /*
@@ -68,14 +67,14 @@ int lower_than_int(void * key1, void * key2) {
 //Función booleana que verifica si la palabra pertenece a la lista de las palabras más usadas en los textos de habla inglesa
 bool esComun (char* palabra)
 {
-    char* commonWords[100] = {"the", "be", "to", "of", "and", "a", "in", "that", "have", "i", "it", "for", "not", "on", 
+    char* commonWords[150] = {"the", "be", "to", "of", "and", "a", "in", "that", "have", "i", "it", "for", "not", "on", 
                              "with", "he", "as", "you", "do", "at", "this", "but", "his", "by", "from", "they", "we", 
                              "say", "her", "she", "or", "an", "will", "my", "one", "all", "would", "there", "their", "what", 
                              "so", "up", "out", "if", "about", "who", "get", "which", "go", "me", "when", "make", "can", "like", 
                              "no", "just", "him", "know", "take", "into", "your", "good", "some", "could", "them", "than", "then", 
                              "now", "come", "its", "i'ts", "also", "how", "our", "well", "even", "want", "because", "any", "this", 
-                             "most", "us", "are", "is"};
-    for (int i = 0; i < 100; i++)
+                             "most", "us", "are", "is", "was", "very", "went", "had", "has", "hasnt"};
+    for (int i = 0; i < 150; i++)
     {
         if (commonWords[i] == NULL) break;
         if (strcmp(palabra, commonWords[i]) == 0) 
